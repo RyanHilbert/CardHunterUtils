@@ -1,17 +1,10 @@
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javax.imageio.ImageIO;
 
 //class used to represent every item in the game, from treasures to weapons
 public class Item{
@@ -132,29 +125,8 @@ public class Item{
         this.card6=card6;
         this.slot=slot;
         this.set=set;
-        Image icon=null;
-        File file=new File("assets/item_illustrations",image+".png");
+        this.icon=AssetLoader.loadImage(AssetLoader.ImageType.Item_Illustrations,image);
         if(image.contains("Default Item"))slot.dfault=this;
-        else if(file.isFile())icon=new Image(file.toURI().toString());
-        else{
-            try{
-                icon=new Image(new URI("http","live.cardhunter.com","/assets/item_illustrations/"+file.getName(),null).toString(),true);
-            }catch(URISyntaxException e){//probably shouldn't happen, but provide a fallback anyway
-                icon=new Image("http://live.cardhunter.com/assets/item_illustrations/"+file.getName(),true);
-            }
-            final Image temp=icon;//needed as 'effectively final' variable in anonymous class
-            icon.progressProperty().addListener(new ChangeListener<Number>(){
-                @Override public void changed(ObservableValue<?extends Number>observable,Number oldValue,Number newValue){
-                    if(newValue.doubleValue()>=1.0){//when icon is finished downloading...
-                        try{//attempt to save it to disk
-                            ImageIO.write(SwingFXUtils.fromFXImage(temp,null),"png",file);
-                        }catch(Exception e){}//file just won't get written in this case, which is fine
-                        observable.removeListener(this);
-                    }
-                }
-            });
-        }
-        this.icon=icon;
         list.add(this);
     }
     //passes CSV data into the Item constructor
@@ -179,5 +151,18 @@ public class Item{
                 Set.value(Byte.parseByte(0+s[23]))
         );
     }
+
+    public static Item byName(String name){
+        for(Item i : list){
+            if(i.name.equalsIgnoreCase(name)){
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    //public static Item EmptyItem=new Item("_",Rarity.Common,(byte) 0,Token.None,Token.None,null,null,null,null,null,null,Slot.Boots,"",Set.Base);
+
     @Override public String toString(){return name;}
 }
