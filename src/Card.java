@@ -141,50 +141,8 @@ public class Card{
         this.quality=quality;
         this.rarity=rarity;
         this.set=set;
-        Image art;
-        final File artFile=new File("assets/card_illustrations",name+".png");
-        if(artFile.isFile())art=new Image(artFile.toURI().toString());
-        else{
-            try{
-                art=new Image(new URI("http","live.cardhunter.com","/assets/card_illustrations/"+artFile.getName(),null).toString(),true);
-            }catch(URISyntaxException e){//probably shouldn't happen, but provide a fallback anyway
-                art=new Image("http://live.cardhunter.com/assets/card_illustrations/"+artFile.getName(),true);
-            }
-            final Image temp=art;//needed as 'effectively final' variable in anonymous class
-            art.progressProperty().addListener(new ChangeListener<Number>(){
-                @Override public void changed(ObservableValue<?extends Number>observable,Number oldValue,Number newValue){
-                    if(newValue.doubleValue()>=1.0){//when art is finished downloading...
-                        try{//attempt to save it to disk
-                            ImageIO.write(SwingFXUtils.fromFXImage(temp,null),"png",artFile);
-                        }catch(Exception e){}//file just won't get written in this case, which is fine
-                        observable.removeListener(this);
-                    }
-                }
-            });
-        }
-        this.art=art;
-        Image thumbnail;
-        final File thumbFile=new File("assets/card_thumbnails",name+".png");
-        if(thumbFile.isFile())thumbnail=new Image(thumbFile.toURI().toString());
-        else{
-            try{
-                thumbnail=new Image(new URI("http","live.cardhunter.com","/assets/card_thumbnails/"+thumbFile.getName(),null).toString(),true);
-            }catch(URISyntaxException e){//probably shouldn't happen, but provide a fallback anyway
-                thumbnail=new Image("http://live.cardhunter.com/assets/card_thumbnails/"+thumbFile.getName(),true);
-            }
-            final Image temp=thumbnail;//needed as 'effectively final' variable in anonymous class
-            thumbnail.progressProperty().addListener(new ChangeListener<Number>(){
-                @Override public void changed(ObservableValue<?extends Number>observable,Number oldValue,Number newValue){
-                    if(newValue.doubleValue()>=1.0){//when thumbnail is finished downloading...
-                        try{//attempt to save it to disk
-                            ImageIO.write(SwingFXUtils.fromFXImage(temp,null),"png",thumbFile);
-                        }catch(Exception e){}//file just won't get written in this case, which is fine
-                        observable.removeListener(this);
-                    }
-                }
-            });
-        }
-        this.thumbnail=thumbnail;
+        this.art=AssetLoader.loadImage(AssetLoader.ImageType.Card_Illustrations,name);
+        this.thumbnail=AssetLoader.loadImage(AssetLoader.ImageType.Card_Thumbnails,name);
         map.put(name,this);
     }
     //passes CSV data into the Card constructor
