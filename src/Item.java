@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -160,6 +161,15 @@ public class Item{
         }
 
         return null;
+    }
+    
+    public static ArrayList<Item> byName(String... names){
+        ArrayList<Item> retVal = new ArrayList<>(names.length);
+        
+        for(String n : names)
+            retVal.add(Item.byName(n));
+
+        return retVal;
     }
 
     //public static Item EmptyItem=new Item("_",Rarity.Common,(byte) 0,Token.None,Token.None,null,null,null,null,null,null,Slot.Boots,"",Set.Base);
