@@ -7,6 +7,11 @@ import javafx.scene.image.Image;
 
 public class Character{
 
+    // <editor-fold defaultstate="collapsed" desc="Consts">
+    public final static String BLOCK_START="[SIZE=";
+    public final static String BLOCK_END="/INDENT]";
+    // </editor-fold>
+
     public final static ObservableList<Character> roster=FXCollections.observableArrayList();
 
     // <editor-fold defaultstate="collapsed" desc="Race and Role Enums">
@@ -77,15 +82,23 @@ public class Character{
         ArrayList<Character> chars=new ArrayList<>();
 
         String remains=String.valueOf(bbCode);
-        int start=remains.indexOf("[SIZE=");
-        int end=remains.indexOf("/INDENT]")+8; // len of /INDENT]
+        int start=remains.indexOf(BLOCK_START);
+        int end=remains.indexOf(BLOCK_END)+BLOCK_END.length();
+
         while(start>=0){
             String block=remains.substring(start,end);
             chars.add(firstFromBBCode(block));
 
             remains=remains.substring(end); 
-            start=remains.indexOf("[SIZE=");
-            end=remains.indexOf("/INDENT]")+8; // len of /INDENT]
+            start=remains.indexOf(BLOCK_START);
+            end=remains.indexOf(BLOCK_END)+BLOCK_END.length();
+
+            // check for long-form bbCode - two block ends before next start
+            if(end<start){
+                remains=remains.substring(end);
+                start=remains.indexOf(BLOCK_START);
+                end=remains.indexOf(BLOCK_END)+BLOCK_END.length();
+            }
         }
 
         return chars;
