@@ -1,6 +1,10 @@
+
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.function.Consumer;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
@@ -15,6 +19,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCharacterCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.GridPane;
@@ -27,7 +32,9 @@ import javafx.scene.shape.Rectangle;
 
 //class responsible for building and displaying parties and their decks
 public class PartyView extends VBox{
-    private final CharPane pane1=new CharPane(),pane2=new CharPane(),pane3=new CharPane();
+    private final CharPane pane1=new CharPane(), pane2=new CharPane(), pane3=new CharPane();
+    private final Clipboard clipboard=Clipboard.getSystemClipboard();
+
     public Consumer<Slot>onSlotClick=slot->{};
     public PartyView(){
         MenuItem copy=new MenuItem("Copy Party to Clipboard");
@@ -38,8 +45,19 @@ public class PartyView extends VBox{
             //deck export code goes here
         });
         paste.setOnAction(event->{
-            //deck import code goes here
+            ArrayList<Character> chars=Character.allFromBBCode(clipboard.getString());
+
+            if(chars.size()>0){
+                pane1.setChar(chars.get(0));
+            }
+            if(chars.size()>1){
+                pane2.setChar(chars.get(1));
+            }
+            if(chars.size()>2){
+                pane3.setChar(chars.get(2));
+            }
         });
+        copy.setDisable(true);
         MenuBar menu=new MenuBar(new Menu("Edit",null,copy,paste));
         ScrollPane scroll=new ScrollPane(new VBox(pane1,pane2,pane3));
         scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
@@ -136,15 +154,44 @@ public class PartyView extends VBox{
             setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
             getTabs().addAll(warrior,priest,wizard);
         }
-        
+
+        public void setChar(Character c){
+            Char target=null;
+            switch(c.role){
+                default:
+                case Warrior:target=warrior;break;
+                case Priest:target=priest;break;
+                case Wizard:target=wizard;break;
+            }
+
+            target.Load(c);
+            this.getSelectionModel().select(target);
+        }
         //internal internal class used to represent a single character as a Tab
         private class Char extends Tab{
             public final StringProperty nameProperty;
             public final StringProperty nameProperty(){return nameProperty;}
             public final String getName(){return nameProperty.get();}
-            public final void setName(String name){nameProperty.set(name);}
-            public Char(final String name,final Slot...slots){
+            public final void setName(String name){
+                nameProperty.set(name);
+            }
+
+            public final ReadOnlyObjectProperty<Integer> levelProperty;
+
+            public final ReadOnlyObjectProperty<Integer> levelProperty(){
+                return levelProperty;
+            }
+
+            public final Integer getLevel(){
+                return levelProperty.get();
+            }
+
+            private final Slot[] itemSlots;
+
+            public Char(final String name,final Slot... slots){
                 super(name);
+                itemSlots=slots;
+
                 GridPane grid=new GridPane();
                 boolean newColumn=true;
                 Label minorLabel=new Label("4",Item.Token.Minor.getView()),majorLabel=new Label("4",Item.Token.Major.getView());
@@ -181,7 +228,7 @@ public class PartyView extends VBox{
                 }
                 Spinner<Integer>levelSpinner=new Spinner<>(6,24,18);
                 levelSpinner.setMaxWidth(52);
-                levelSpinner.valueProperty().addListener((observable,oldValue,newValue)->{
+                (this.levelProperty=levelSpinner.valueProperty()).addListener((observable,oldValue,newValue) -> {
                     final int minorTotal=Byte.parseByte(minorLabel.getText())+Item.Token.Minor.getAmountAtLevel(newValue)-Item.Token.Minor.getAmountAtLevel(oldValue);
                     final int majorTotal=Byte.parseByte(majorLabel.getText())+Item.Token.Major.getAmountAtLevel(newValue)-Item.Token.Major.getAmountAtLevel(oldValue);
                     minorLabel.setText(String.valueOf(minorTotal));
@@ -201,6 +248,37 @@ public class PartyView extends VBox{
                 });
                 nameField.setPromptText("Character Name (Optional)");
                 setContent(new VBox(new HBox(nameField,minorLabel,majorLabel,levelSpinner),grid));
+            }
+
+            private void Equip(Build equipment){
+                if(this.levelProperty.get()<equipment.minLevel){
+                    // todo: update level?  no-can-do message to user?
+                }
+
+                ArrayList<Item> copy=(ArrayList<Item>) equipment.items.clone();
+
+                for(Slot s : itemSlots){
+                    if(s!=null){
+                        Item item=null;
+                        for(Item i : copy){
+                            if(s.set.contains(i.slot)){
+                                item=i;
+                                break;
+                            }
+                        }
+
+                        if(item!=null){
+                            copy.remove(item);
+                            s.setItem(item);
+                        }
+                    }
+                }
+            }
+
+            private void Load(Character c){
+                setName(c.name);
+
+                Equip(c.equipment);
             }
         }
     }
