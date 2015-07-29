@@ -1,3 +1,4 @@
+import app.App;
 import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -171,8 +172,45 @@ public class Item{
 
         return retVal;
     }
+    
+    public String toCardViewJson() {
+        return this.toCardViewJson(App.state().compareCardArt);
+    }
 
-    //public static Item EmptyItem=new Item("_",Rarity.Common,(byte) 0,Token.None,Token.None,null,null,null,null,null,null,Slot.Boots,"",Set.Base);
-
+    public String toCardViewJson(boolean comparisons) {
+        String format = 
+            "cardViewData = {\n" +
+            "title: \"%s\", \n" +
+            "cards: [\"%s\"], \n" +
+            "comparisons: %s };";
+        
+        String json = String.format(format, 
+            this.name,
+            this.getCardsString(),
+            comparisons
+        );
+        
+        return json;
+    }
+    
+    public String getCardsString() {
+        ArrayList<String> cards = new ArrayList<String>();
+        
+        if (card1 != null)
+            cards.add(card1.name);
+        if (card2 != null)
+            cards.add(card2.name);
+        if (card3 != null)
+            cards.add(card3.name);
+        if (card4 != null)
+            cards.add(card4.name);
+        if (card5 != null)
+            cards.add(card5.name);
+        if (card6 != null)
+            cards.add(card6.name);
+        
+        return String.join("\", \"", cards.toArray(new String[cards.size()]));
+    }
+    
     @Override public String toString(){return name;}
 }

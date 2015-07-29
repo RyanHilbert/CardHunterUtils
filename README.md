@@ -17,10 +17,19 @@ Deck manager and party builder utility for Card Hunter by Blue Manchu
 <img width="1552" alt="filters" src="https://cloud.githubusercontent.com/assets/750196/9564090/befbb808-4e68-11e5-9007-025a2b7eaf98.png">
 
 ## Item Card Inspector
-<img width="1524" alt="itemcards" src="https://cloud.githubusercontent.com/assets/750196/9564091/befe4690-4e68-11e5-82f7-6b7e0ad53ffc.png">
+<img width="1524" alt="itemcards" src="https://cloud.githubusercontent.com/assets/750196/9569977/1a5b25d0-4f4a-11e5-887e-e0a3c93c0394.png">
 
 ## HTML Card Viewer
-<img width="1552" alt="allcards" src="https://cloud.githubusercontent.com/assets/750196/9564246/73ca1a68-4e6e-11e5-8a74-cebc4eea3f8b.png">
+<img width="1552" alt="allcards" src="https://cloud.githubusercontent.com/assets/750196/9569953/bb4246dc-4f49-11e5-8edc-c504c6f43147.png">
+
+# How To Run It
+Grab the latest published `cardhunterutils.jar` file from [our Card Hunter Forums thread](http://forums.cardhunter.com/threads/card-hunter-utility-program.7377/).  Get a fairly recent [version of Java](https://java.com/en/download/), if you don't have one already.  
+
+Mix lightly in a command prompt, separating ingredients with spaces (` `).  Add the `java` first, followed by `-jar`.  Finally, add the path to the downloaded `cardhunterutils.jar` file.  Press enter and serve immediately.
+
+We'll get builds published here on Github... you know, ... *Real Soon Now*.
+
+**ALSO**: For the utmost in gorgeous card art, make sure you have a non-crappy version of the Garamond font installed.  We highly recommend the beautiful [Garamond No. 8](http://garamond.org/), available as a free download [here](http://garamond.org/urw/). [This Garamond](http://www.fontage.com/_zips/garamond.zip), on the other hand, is hella crappy.  We warned you.
 
 # What's Happening Now
 Check out the current issues list on [the Github page](https://github.com/Xayrn/CardHunterUtils/issues), or check out [the thread](http://forums.cardhunter.com/threads/card-hunter-utility-program.7377/) at the Card Hunter forums.

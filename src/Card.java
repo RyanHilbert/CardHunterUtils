@@ -146,7 +146,7 @@ public class Card{
     public class Thumbnail extends Group{
         public Thumbnail(){
             setOnMouseClicked(mouse->{
-                if(mouse.getButton()==MouseButton.SECONDARY)Card.this.context.show(this,mouse.getScreenX(),mouse.getScreenY());
+                if(MouseHelper.isRightClick(mouse))Card.this.context.show(this,mouse.getScreenX(),mouse.getScreenY());
             });
             final double height=60,width=height/1.4,border=2;
             ObservableList<Node>children=getChildren();
@@ -184,6 +184,7 @@ public class Card{
         }
     }
     private final ContextMenu context;
+    public final int id;
     public final String name,shortName,text,flavorText,triggerText;
     public final Type type1,type2;
     public final AttackType attackType;
@@ -191,13 +192,19 @@ public class Card{
     public final byte damage,range,movement,duration;
     public final Quality quality;
     public final Rarity rarity;
+    public final Action action;
+    public final Trigger trigger1;
+    public final Trigger trigger2;
     public final Set set;
+    public final boolean implemented;
     public final Image art;
+    public final boolean artHeld;
     public final Image thumbnail;
     public Thumbnail getThumbnail(){return new Thumbnail();}
     public View view(){return new View();}
     
-    public Card(String name,String shortName,Type type1,Type type2,AttackType attackType,DamageType damageType,byte damage,byte range,byte movement,byte duration,String text,String flavorText,String triggerText,Quality quality,Rarity rarity,Set set){
+    public Card(int id,String name,String shortName,Type type1,Type type2,AttackType attackType,DamageType damageType,byte damage,byte range,byte movement,byte duration,String text,String flavorText,String triggerText,Quality quality,Rarity rarity,Set set,Action action,Trigger trigger1,Trigger trigger2,boolean implemented,boolean artHeld){
+        this.id=id;
         this.name=name;
         this.shortName=shortName.isEmpty()?name:shortName;
         this.type1=type1;
@@ -211,10 +218,19 @@ public class Card{
         this.text=text;
         this.flavorText=flavorText;
         this.triggerText=triggerText;
+        this.action = action;
+        this.trigger1 = trigger1;
+        this.trigger2 = trigger2;
         this.quality=quality;
         this.rarity=rarity;
         this.set=set;
-        this.art=AssetLoader.loadImage(AssetLoader.ImageType.Card_Illustrations,name);
+        this.implemented=implemented;
+        this.artHeld=artHeld;
+        if(!this.artHeld)
+            this.art=AssetLoader.loadImage(AssetLoader.ImageType.Card_Illustrations,name);
+        else
+            this.art=null;
+
         this.thumbnail=AssetLoader.loadImage(AssetLoader.ImageType.Card_Thumbnails,name);
         this.context=new ContextMenu(new CustomMenuItem(new View()));
         map.put(name,this);
@@ -223,19 +239,150 @@ public class Card{
     public static Card fromCSV(String string){
         String[]s=CSV.tokenizeLine(string);
         String[]types=s[3].split(",");
-        return new Card(s[1],s[2],
-                Type.valueOf(types[0]),
-                types.length<2?null:Type.valueOf(types[1]),
-                s[4].isEmpty()?null:AttackType.valueOf(s[4]),
-                s[5].isEmpty()?null:DamageType.valueOf(s[5]),
-                Byte.parseByte(0+s[6]),
-                Byte.parseByte(0+s[8]),
-                Byte.parseByte(0+s[9]),
-                Byte.parseByte(0+s[10]),
-                s[17],s[18],s[20],
-                Quality.fromStrings(s[39],s[40]),
-                s[47].isEmpty()?null:Rarity.valueOf(s[47]),
-                Set.value(Integer.parseInt(0+s[53])));
+        return new Card(toInt(s[0]),s[1],s[2],
+            Type.valueOf(types[0]),
+            types.length<2?null:Type.valueOf(types[1]),
+            s[4].isEmpty()?null:AttackType.valueOf(s[4]),
+            s[5].isEmpty()?null:DamageType.valueOf(s[5]),
+            toByte(s[6]),
+            toByte(s[8]),
+            toByte(s[9]),
+            toByte(s[10]),
+            s[17],s[18],s[20],
+            Quality.fromStrings(s[39],s[40]),
+            s[47].isEmpty()?null:Rarity.valueOf(s[47]),
+            Set.value(toInt(s[53])),
+            ((s[17]+s[18]).trim().length() > 0) ? new Action(Type.valueOf(types[0]), s[17], s[18], toByte(s[6]), toByte(s[8]), toByte(s[9])) : null,
+            (s[13].trim().length() > 0) ? new Trigger(toInt(s[11]), toInt(s[12]), Trigger.Effect.valueOf(s[13]), s[20]) : null,
+            (s[16].trim().length()>0) ? new Trigger(toInt(s[14]),toInt(s[15]),Trigger.Effect.valueOf(s[16]),s[24]) : null,
+            !s[50].isEmpty(),
+            (s[56].toLowerCase().equals("hold"))
+        );
     }
+    
+    private static byte toByte(String field) {
+        return (field == null || field.isEmpty()) ? (byte)0 : Byte.parseByte(field);
+    }
+    
+    private static int toInt(String field) {
+        return (field == null || field.isEmpty()) ? 0 : Integer.parseInt(field, 10);
+    }
+    
+    // serializes a card into its corresponding json object
+    public final String toJSON() {
+        String format="{ id: %s, " +
+            "name: \"%s\", " +
+            "shortName: \"%s\", " +
+            "type1: \"%s\", " +
+            "type2: \"%s\",\n" +
+            "attackType: \"%s\", " +
+            "damageType: \"%s\", " +
+            "damage: %s,\n" +
+            "range: %s, " +
+            "movement: %s, " +
+            "duration: %s,\n" +
+            "text: \"%s\",\n" +
+            "flavorText: \"%s\",\n" +
+            "triggerText: \"%s\",\n" +
+            "quality: \"%s\", " +
+            "rarity: \"%s\", " +
+            "set: \"%s\", " +
+            "image: { name: \"%s\", ext: \".png\" },\n" +
+            "hasAction: %s, " +
+            "hasEffect1: %s, " +
+            "hasEffect2: %s,\n" +
+            "implemented: %s,\n" +
+            "artHeld: %s,\n" +
+            "action: { \n" +
+                "\ttext: \"%s\", icons: [ \n" +
+                    "\t\t{ side: \"left\", type: \"%s\", amount: %s }, \n" +
+                    "\t\t{ side: \"right\", type: \"%s\", amount: %s } \n" +
+            " ] },\n" +
+            "triggers: [ { \n" +
+                "\ttext: \"%s\", icons: [ \n" +
+                    "\t\t{ side: \"left\", type: \"%s\", amount: %s }, \n" +
+                    "\t\t{ side: \"right\", type: \"%s\", amount: %s } \n" +
+                " ] }, { \n" + 
+                "\ttext: \"%s\", icons: [ \n" +
+                    "\t\t{ side: \"left\", type: \"%s\", amount: %s }, \n" +
+                    "\t\t{ side: \"right\", type: \"%s\", amount: %s } \n" +
+            "] } ] }\n\n";
+        
+        boolean hasAction = this.action != null && !(this.action.text.isEmpty() && this.action.iconLeft.isEmpty() && this.action.iconRight.isEmpty());
+        boolean hasTrigger1 = this.trigger1 != null && !this.trigger1.text.isEmpty() && !(this.trigger1.iconLeft.isEmpty() && this.trigger1.iconRight.isEmpty());
+        boolean hasTrigger2 = this.trigger2 != null && !this.trigger2.text.isEmpty() && !(this.trigger2.iconLeft.isEmpty() && this.trigger2.iconRight.isEmpty());
+        
+        String json=String.format(format,
+            this.id,
+            safe(this.name),
+            safe(this.shortName),
+            safe(this.type1),
+            safe(this.type2),
+            safe(this.attackType),
+            safe(this.damageType),
+            this.damage,
+            this.range,
+            this.movement,
+            this.duration,
+            safe(this.text).replace("\"", "\\\""),
+            safe(this.flavorText).replace("\"", "\\\""),
+            safe(this.triggerText).replace("\"", "\\\""),
+            safe(this.quality).replace("-", "").replace("+", ""),
+            safe(this.rarity),
+            safe(this.set),
+            safe(this.name),
+            hasAction,
+            hasTrigger1,
+            hasTrigger2,
+            safe(this.implemented),
+            safe(this.artHeld),
+            hasAction ? this.action.fullText.replace("\"", "\\\"") : "",
+            hasAction ? this.action.iconLeft : "",
+            hasAction ? this.action.amountLeft : 0,
+            hasAction ? this.action.iconRight : "",
+            hasAction ? this.action.amountRight : 0,
+            (hasTrigger1 ? this.trigger1.text.replace("\"", "\\\"") : "") + (hasAction && this.flavorText.length() > 0 ? "" : "<br /><br /><i>" + safe(this.flavorText.trim()).replace("\"", "\\\"") + "</i>"),
+            hasTrigger1 ? this.trigger1.iconLeft : "",
+            hasTrigger1 ? this.trigger1.amountLeft : 0,
+            hasTrigger1 ? this.trigger1.iconRight : "",
+            hasTrigger1 ? this.trigger1.amountRight : 0,
+            hasTrigger2 ? this.trigger2.text.replace("\"", "\\\"") : "",
+            hasTrigger2 ? this.trigger2.iconLeft : "",
+            hasTrigger2 ? this.trigger2.amountLeft : 0,
+            hasTrigger2 ? this.trigger2.iconRight : "",
+            hasTrigger2 ? this.trigger2.amountRight : 0
+        );
+        
+        return json;
+    }
+    
+    public static final String safe(Object o){
+        return (o != null) ? o.toString() : "";
+    }
+    
+    public static final String namesToJSONArray() {
+        String names = "cardNames = [ \"";
+
+        names += String.join("\",\n\"", map.keySet());
+        
+        names += "\" ];";
+                
+        return names;
+    }
+    
+    public static final String allToJSON() {
+        String cards = "cards = { ";
+        
+        for (Card c : map.values()) {
+            cards += "\"" + c.name + "\": ";
+            cards += c.toJSON();
+            cards += ",\n";
+        }
+        
+        cards = cards.substring(0, cards.length() - 2) + " };";
+                
+        return cards;
+    }
+    
     @Override public String toString(){return name;}
 }

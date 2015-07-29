@@ -2,6 +2,7 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.TableColumn;
@@ -10,8 +11,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 public class ItemTable extends TableView<Item>{
+    private boolean inHeader = false;
+    
     public ItemTable(){
         final FilteredList<Item>filter=new FilteredList<>(Item.list,item->true);
         final SortedList<Item>sorter=new SortedList<>(filter);
@@ -72,5 +76,19 @@ public class ItemTable extends TableView<Item>{
         columns.add(cardCol);
         columns.add(slotCol);
         columns.add(setCol);
+                
+        setOnMouseClicked(event->{
+            if(MouseHelper.isRightClick(event) && !inHeader)
+                new CardViewer(this.getSelectionModel().getSelectedItem()).show((Stage) this.getScene().getWindow());
+        });
+    }
+    
+    public void onShow() {
+        // HACK: poor man's event suppression
+        final Node header = this.lookup("TableHeaderRow");
+        if (header != null) {
+            header.setOnMouseEntered(event-> { this.inHeader = true; });
+            header.setOnMouseExited(event-> { this.inHeader = false; });
+        }
     }
 }

@@ -1,4 +1,5 @@
 
+import app.App;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Paths;
@@ -11,6 +12,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -43,11 +45,27 @@ public class PartyView extends VBox{
     private String characterTemplate = "", itemTemplate = "";
 
     public Consumer<Slot>onSlotClick=slot->{};
+    public Consumer<Slot>onSlotRightClick=slot->{};
     public PartyView(){
         MenuItem viewCards=new MenuItem("View All Card Art");
         viewCards.setOnAction(event -> {
-            ModalDialog.show((Stage) this.getScene().getWindow(),new CardPane());
+            ModalDialog.show(getStage(), "CardPane", new CardPane());
         });
+        MenuItem viewHtmlCards=new MenuItem("View HTML Card Art");
+        viewHtmlCards.setOnAction(event -> {
+           new CardViewer().show(getStage()); 
+        });
+        
+        CheckMenuItem openExternally=new CheckMenuItem("Open card view in external broser");
+        openExternally.setOnAction(event -> {
+           App.state().openExternally = openExternally.isSelected();
+        });
+        
+        CheckMenuItem compareCardArt = new CheckMenuItem("Compare card art with wiki images");
+        compareCardArt.setOnAction(event -> {
+            App.state().compareCardArt = compareCardArt.isSelected();
+        });
+        
         MenuItem copy=new MenuItem("Copy Party to Clipboard");
         MenuItem paste=new MenuItem("Paste Party from Clipboard");
         copy.setAccelerator(new KeyCharacterCombination("C",KeyCombination.SHORTCUT_DOWN));
@@ -62,7 +80,7 @@ public class PartyView extends VBox{
             setCurrentParty(clipboard.getString());
         });
 
-        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("View",null,viewCards),new Menu("Edit",null,copy,paste));
+        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("View",null,viewCards,viewHtmlCards,openExternally,compareCardArt),new Menu("Edit",null,copy,paste));
         ScrollPane scroll=new ScrollPane(new VBox(pane1,pane2,pane3));
         scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
         getChildren().addAll(menu,scroll);
@@ -87,7 +105,7 @@ public class PartyView extends VBox{
             fileChooser.setInitialDirectory(
                 new File(Paths.get(System.getProperty("user.dir"),"saved","parties").toString())
             );
-            SavePartyTo(fileChooser.showSaveDialog(getStage()));
+            savePartyTo(fileChooser.showSaveDialog(getStage()));
         });
 
         return new Menu("File",null,load,save);
@@ -164,7 +182,7 @@ public class PartyView extends VBox{
             setCurrentParty(FileUtils.textFromFile(file));
     }
     
-    public final void SavePartyTo(File file) {
+    public final void savePartyTo(File file) {
         if(file!=null)
             FileUtils.writeFile(file, getCurrentPartyBBCode());
     }
@@ -213,8 +231,16 @@ public class PartyView extends VBox{
             ImageView view=new ImageView(defaultItem.icon);
             StackPane stack=new StackPane(button,view);
             getChildren().add(stack);
-            button.setOnMouseClicked(event->onSlotClick.accept(this));
-            view.setOnMouseClicked(event->onSlotClick.accept(this));
+            button.setOnMouseClicked(event-> { 
+                if(MouseHelper.isRightClick(event)) 
+                    onSlotRightClick.accept(this); 
+                else onSlotClick.accept(this);
+            } );
+            view.setOnMouseClicked(event-> { 
+                if(MouseHelper.isRightClick(event)) 
+                    onSlotRightClick.accept(this); 
+                else onSlotClick.accept(this);
+            } );
             itemProperty.addListener((observable,oldValue,newValue)->{
                 view.setImage(newValue.icon);
                 getChildren().remove(tokens);

@@ -1,5 +1,7 @@
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -15,7 +17,35 @@ public final class AssetLoader{
     
     public static final File assetDirectory=new File("assets");
     public static final File audioDirectory=new File(assetDirectory,"audio");
-    static{audioDirectory.mkdirs();}
+    public static final File cardDir=new File("data/gameplay/Cards");
+    public static final File itemDir=new File("data/gameplay/Equipment");
+        
+    static {
+        //create all necessary directories...        
+        audioDirectory.mkdirs();
+        cardDir.mkdirs();
+        itemDir.mkdirs();
+    }
+
+    public static void setupJSON() {
+        File jsonFile=new File(cardDir,"cards.js");
+        if (jsonFile.exists())
+            jsonFile.delete();
+        
+        try {
+            jsonFile.createNewFile();
+            PrintWriter writer = new PrintWriter(jsonFile.getPath(), "UTF-8");
+
+            writer.print(Card.namesToJSONArray());
+            writer.println();
+            writer.println();
+            writer.print(Card.allToJSON());
+            
+            writer.close();
+        } catch (IOException ex) {
+            System.out.println("Problem trying to create card json:" + ex.getMessage());
+        }
+    }
     
     public static enum ImageType{
         Board_Decal_Doodads("png"),
