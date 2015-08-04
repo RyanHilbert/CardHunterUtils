@@ -2,7 +2,6 @@
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.function.Consumer;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -71,12 +70,21 @@ public class PartyView extends VBox{
         private Item.Token.Pair.View tokens;
         public final ObjectProperty<Item>itemProperty(){return itemProperty;}
         public final Item getItem(){return itemProperty.get();}
-        public final void setItem(Item item){itemProperty.set(item);}
+        public final void setItem(Item item){
+            itemProperty.set(item);
+        }
+
+        public final boolean isHolding(Item item){
+            return (itemProperty.get()==item);
+        }
+
+        public final void empty(){
+            itemProperty.set(set.iterator().next().dfault);
+        }
         public final ObjectProperty<Item>itemProperty=new SimpleObjectProperty<Item>(){
             @Override public void setValue(Item item){set(item);}
             @Override public void set(Item item){
-                if(itemProperty.get()==item)super.set(set.iterator().next().dfault);
-                else if(set.contains(item.slot))super.set(item);
+                if(set.contains(item.slot))super.set(item);
             }
         };
         public Slot(Item defaultItem,Item.Slot...slots){this(defaultItem.slot.toString().replace(' ','\n'),defaultItem,slots);}
@@ -255,13 +263,18 @@ public class PartyView extends VBox{
                     // todo: update level?  no-can-do message to user?
                 }
 
+                System.out.format("Cloning equipment: %s\n",equipment.items.toString());
                 ArrayList<Item> copy=(ArrayList<Item>) equipment.items.clone();
 
+                System.out.format("Equipping slots...\n");
                 for(Slot s : itemSlots){
                     if(s!=null){
+                        System.out.format("\tTrying to fill a %s slot...\n",s.set.toArray()[0].toString());
                         Item item=null;
                         for(Item i : copy){
+                            System.out.format("\t\tConsidering %s, which is a %s...\n",i.name,i.slot.toString());
                             if(s.set.contains(i.slot)){
+                                System.out.format("\t\tThat's a match!\n");
                                 item=i;
                                 break;
                             }
@@ -269,13 +282,20 @@ public class PartyView extends VBox{
 
                         if(item!=null){
                             copy.remove(item);
+                            System.out.format("\tTook %s from the clone pile, now what's left is: %s\n",item.name,copy.toString());
+                            if(s.getItem()!=null){
+                                System.out.format("\t\tReplacing %s with %s...\n",s.getItem().name,item.name);
+                            }
+
                             s.setItem(item);
+                            System.out.format("\tOk, there's your %s!\n",item.name);
                         }
                     }
                 }
             }
 
             private void Load(Character c){
+                System.out.format("\n\nLoading %s...\n--------\n",c.name);
                 setName(c.name);
 
                 Equip(c.equipment);

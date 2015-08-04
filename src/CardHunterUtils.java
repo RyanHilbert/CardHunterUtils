@@ -42,7 +42,15 @@ public class CardHunterUtils extends Application{
         table.setPrefWidth(0);
         HBox.setHgrow(table,Priority.ALWAYS);
         PartyView party=new PartyView();
-        party.onSlotClick=slot->slot.setItem(table.getFocusModel().getFocusedItem());
+        party.onSlotClick=slot -> {
+            Item item=table.getFocusModel().getFocusedItem();
+            if(slot.isHolding(item)){
+                slot.empty();
+            }
+            else{
+                slot.setItem(item);
+            }
+        };
         stage.setTitle("Card Hunter Utility Program");
         stage.setScene(new Scene(new HBox(party,table),1000,750));
         stage.show();
