@@ -10,6 +10,7 @@ public class Character{
     // <editor-fold defaultstate="collapsed" desc="Consts">
     public final static String BLOCK_START="[SIZE=";
     public final static String BLOCK_END="/INDENT]";
+    public final static int MAX_EXPORT_ITEMS = 10;
     // </editor-fold>
 
     public final static ObservableList<Character> roster=FXCollections.observableArrayList();
@@ -68,7 +69,7 @@ public class Character{
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Constructor">
-    private Character(String name,int level,Race race,Role role,String image,Item... items){
+    public Character(String name,int level,Race race,Role role,String image,Item... items){
         this.name=name;
         this.level=level;
         this.race=race;
@@ -178,5 +179,19 @@ public class Character{
     @Override
     public String toString(){
         return name;
+    }
+    
+    public String toBBCode(String charTemplate, String itemTemplate) {
+        ArrayList<String> items = new ArrayList<String>();
+        
+        for (Item i : equipment.items)
+        {
+            if (items.size() < MAX_EXPORT_ITEMS)
+                items.add(String.format(itemTemplate, i.name));
+        }
+        
+        String bbCode = String.format(charTemplate, name, level, race, role, String.join("\n", items));
+        
+        return bbCode;
     }
 }

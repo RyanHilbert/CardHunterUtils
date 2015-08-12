@@ -3,17 +3,25 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.SplitPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 public class CardHunterUtils extends Application{
     public static void main(String...args){launch(args);}
-    @Override public void start(Stage stage)throws Exception{
+    
+    private PartyView party;
+    private File partyFile;
+    
+    @Override
+    public void start(Stage stage) throws Exception{
+        File partiesDir=new File(Paths.get(System.getProperty("user.dir"),"saved","parties").toString());
+        partiesDir.mkdirs();
+
         File cardDir=new File("data/gameplay/Cards"),itemDir=new File("data/gameplay/Equipment");
         cardDir.mkdirs();//create all necessary directories...
         itemDir.mkdirs();
@@ -41,7 +49,8 @@ public class CardHunterUtils extends Application{
         ItemTable table=new ItemTable();//setup the user interface
         table.setPrefWidth(0);
         HBox.setHgrow(table,Priority.ALWAYS);
-        PartyView party=new PartyView();
+        
+        party=new PartyView();
         party.onSlotClick=slot -> {
             Item item=table.getFocusModel().getFocusedItem();
             if(slot.isHolding(item)){
@@ -51,8 +60,22 @@ public class CardHunterUtils extends Application{
                 slot.setItem(item);
             }
         };
+        
+        partyFile=new File(partiesDir,"currentParty.bbcode");
+        if(partyFile.isFile())
+            party.LoadPartyFrom(partyFile);
+        
         stage.setTitle("Card Hunter Utility Program");
         stage.setScene(new Scene(new HBox(party,table),1000,750));
+        
         stage.show();
+    }
+    
+    @Override
+    public void stop(){
+        System.out.println("Stage is closing");
+        
+        if (party != null && partyFile != null)
+            party.SavePartyTo(partyFile);
     }
 }
