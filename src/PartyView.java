@@ -9,6 +9,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -43,6 +44,10 @@ public class PartyView extends VBox{
 
     public Consumer<Slot>onSlotClick=slot->{};
     public PartyView(){
+        MenuItem viewCards=new MenuItem("View All Card Art");
+        viewCards.setOnAction(event -> {
+            ModalDialog.show((Stage) this.getScene().getWindow(),new CardPane());
+        });
         MenuItem copy=new MenuItem("Copy Party to Clipboard");
         MenuItem paste=new MenuItem("Paste Party from Clipboard");
         copy.setAccelerator(new KeyCharacterCombination("C",KeyCombination.SHORTCUT_DOWN));
@@ -57,7 +62,7 @@ public class PartyView extends VBox{
             setCurrentParty(clipboard.getString());
         });
 
-        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("Edit",null,copy,paste));
+        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("View",null,viewCards),new Menu("Edit",null,copy,paste));
         ScrollPane scroll=new ScrollPane(new VBox(pane1,pane2,pane3));
         scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
         getChildren().addAll(menu,scroll);
