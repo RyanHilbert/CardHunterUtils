@@ -35,10 +35,10 @@ public class ModalDialog{
         columnConstraints.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().add(columnConstraints);
 
-        dialog.setScene(new Scene(grid, //800,600));
-             Math.min(grid.widthProperty().intValue(),800),
-             Math.min(grid.heightProperty().intValue(),600))
-        );
+        dialog.setScene(new Scene(grid, 800,600));
+             //Math.min(grid.widthProperty().intValue(),800),
+             //Math.min(grid.heightProperty().intValue(),600))
+        //);
 
         setMouseEvents(dialog);
 
