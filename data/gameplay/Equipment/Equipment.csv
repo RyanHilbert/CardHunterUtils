@@ -1628,6 +1628,7 @@ Id,Equipment Name,Short Name,Rarity,Level,Introductory Level,Total Value,Talent 
 2344,Klonox's Warper,,Legendary,19,13,19,2,-1,Accelerate Time,Illusory Barrier,Firestorm,,,,,,,,Arcane Item,,ExArcaneY,,2,,
 2345,Spatiomancer's Sidearm,Spatiomancer's Gun,Legendary,20,7,20,2,-1,Hypnotic Beacon,Volcano,Stone Spikes,,,,,,,,Arcane Item,,ExArcaneZ,,2,,
 2346,Reality Warper,,Legendary,21,9,21,2,-1,Accelerate Time,Short Perplexing Ray,Telekinesis,,,,,,,,Arcane Item,,ExArcaneZ2,,2,,
+2347,Dynamic Staff,,Common,18,3,36,2,2,Surging Blast,Surging Blast,Surging Blast,Surging Bolt,Surging Bolt,Unstable Bolt,,,,,Staff,,AA1,,3,,
 100001,Perfect Stoutness,,Legendary,18,9,18,2,-1,Duck,Duck,Officer's Harness,,,,,,,,Dwarf Skill,,Skill Dwarf Persistance G,,0,,
 100002,Superb Stoutness,,Epic,18,9,18,2,-1,Duck,Duck,Reliable Hide Armor,,,,,,,,Dwarf Skill,,Skill Dwarf Persistance G,,0,,
 100003,Advanced Stoutness,Advanced Stout.,Uncommon,18,6,18,2,-1,Absorbing Block,Immovable,Hit the Deck,,,,,,,,Dwarf Skill,,Skill Dwarf Persistance S,,0,,

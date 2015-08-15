@@ -1,3 +1,5 @@
+package card.hunter.fx;
+
 
 import app.App;
 

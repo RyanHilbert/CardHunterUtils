@@ -1,3 +1,4 @@
+package card.hunter.fx;
 import app.App;
 import java.util.ArrayList;
 import java.util.HashMap;
