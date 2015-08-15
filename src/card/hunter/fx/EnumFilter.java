@@ -1,3 +1,5 @@
+package card.hunter.fx;
+
 import java.util.EnumSet;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

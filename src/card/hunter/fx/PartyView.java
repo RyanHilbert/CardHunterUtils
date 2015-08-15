@@ -1,3 +1,5 @@
+package card.hunter.fx;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
