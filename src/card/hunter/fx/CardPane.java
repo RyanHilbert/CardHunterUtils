@@ -1,3 +1,6 @@
+package card.hunter.fx;
+
+import card.hunter.Card;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;

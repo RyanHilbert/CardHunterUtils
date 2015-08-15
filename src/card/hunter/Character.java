@@ -1,3 +1,6 @@
+package card.hunter;
+
+import card.hunter.assets.Assets;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,7 +77,7 @@ public class Character{
         this.level=level;
         this.race=race;
         this.role=role;
-        this.figure=AssetLoader.loadImage(AssetLoader.ImageType.Large_Portraits,image);
+        this.figure=Assets.large_portraits.load(image);
         this.equipment=new Build(name+"'s Gear",race,role,level,items);
         roster.add(this);
     }

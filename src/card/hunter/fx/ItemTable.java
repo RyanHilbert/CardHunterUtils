@@ -1,3 +1,5 @@
+package card.hunter.fx;
+
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
