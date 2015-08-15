@@ -57,13 +57,13 @@ public class PartyView extends VBox{
             setCurrentParty(clipboard.getString());
         });
 
-        MenuBar menu=new MenuBar(BuildFileMenu(),new Menu("Edit",null,copy,paste));
+        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("Edit",null,copy,paste));
         ScrollPane scroll=new ScrollPane(new VBox(pane1,pane2,pane3));
         scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
         getChildren().addAll(menu,scroll);
     }
 
-    private final Menu BuildFileMenu(){
+    private final Menu buildFileMenu(){
         MenuItem load=new MenuItem("Load party...");
         MenuItem save=new MenuItem("Save party as...");
         load.setAccelerator(new KeyCharacterCombination("O",KeyCombination.SHORTCUT_DOWN));
@@ -74,7 +74,7 @@ public class PartyView extends VBox{
             fileChooser.setInitialDirectory(
                 new File(Paths.get(System.getProperty("user.dir"),"saved","parties").toString())
             );
-            LoadPartyFrom(fileChooser.showOpenDialog(getStage()));
+            loadPartyFrom(fileChooser.showOpenDialog(getStage()));
         });
         save.setOnAction(event -> {
             FileChooser fileChooser=new FileChooser();
@@ -98,7 +98,7 @@ public class PartyView extends VBox{
                 characterTemplate = FileUtils.textFromFile("templates/character.bbcode");
         }
         catch (FileNotFoundException ex) {
-            System.out.println("Uh oh - the character bbcode template wasn't there.");
+            System.err.println("Uh oh - the character bbcode template wasn't there.");
             characterTemplate = "Uh oh - the character bbcode template wasn't there.";
         }
 
@@ -107,12 +107,12 @@ public class PartyView extends VBox{
                 itemTemplate = FileUtils.textFromFile("templates/item.bbcode");
         }
         catch (FileNotFoundException ex) {
-            System.out.println("Uh oh - the item bbcode template wasn't there.");
+            System.err.println("Uh oh - the item bbcode template wasn't there.");
             itemTemplate = "Uh oh - the item bbcode template wasn't there.";
         }
         
         String partyBBCode = "";
-        for (Character c : GetChars()) {
+        for (Character c : getChars()) {
             partyBBCode += String.format("%s%n%n", c.toBBCode(characterTemplate, itemTemplate));
         }
 
@@ -122,10 +122,10 @@ public class PartyView extends VBox{
     private final void setCurrentParty(String bbCode) {
         ArrayList<Character> chars=Character.allFromBBCode(bbCode);
 
-        SetChars(chars);
+        setChars(chars);
     }
 
-    private final void SetChars(ArrayList<Character> chars){
+    private final void setChars(ArrayList<Character> chars){
         if(chars.size()>0){
             pane1.setChar(chars.get(0));
         }
@@ -139,7 +139,7 @@ public class PartyView extends VBox{
         }
     }
 
-    private final ArrayList<Character> GetChars(){
+    private final ArrayList<Character> getChars(){
         ArrayList<Character> chars=new ArrayList<Character>();
 
         CharPane[] panes=new CharPane[]{pane1,pane2,pane3};
@@ -154,7 +154,7 @@ public class PartyView extends VBox{
         return chars;
     }
     
-    public final void LoadPartyFrom(File file) {
+    public final void loadPartyFrom(File file) {
         if(file!=null)
             setCurrentParty(FileUtils.textFromFile(file));
     }
@@ -432,7 +432,7 @@ public class PartyView extends VBox{
                     case Human_Skill:
                         return Character.Race.Human;
                     default:
-                        System.out.format("Weird - was looking at a racial skill slot, but got %s instead.", type);
+                        System.err.format("Weird - was looking at a racial skill slot, but got %s instead.", type);
                         return Character.Race.Human;
                 }
             }

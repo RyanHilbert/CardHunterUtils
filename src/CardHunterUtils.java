@@ -63,7 +63,7 @@ public class CardHunterUtils extends Application{
         
         partyFile=new File(partiesDir,"currentParty.bbcode");
         if(partyFile.isFile())
-            party.LoadPartyFrom(partyFile);
+            party.loadPartyFrom(partyFile);
         
         stage.setTitle("Card Hunter Utility Program");
         stage.setScene(new Scene(new HBox(party,table),1000,750));
