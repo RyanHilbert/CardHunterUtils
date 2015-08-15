@@ -1,4 +1,7 @@
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.function.Consumer;
@@ -19,6 +22,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCharacterCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.GridPane;
@@ -28,11 +32,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 //class responsible for building and displaying parties and their decks
 public class PartyView extends VBox{
     private final CharPane pane1=new CharPane(), pane2=new CharPane(), pane3=new CharPane();
     private final Clipboard clipboard=Clipboard.getSystemClipboard();
+    private String characterTemplate = "", itemTemplate = "";
 
     public Consumer<Slot>onSlotClick=slot->{};
     public PartyView(){
@@ -41,26 +48,120 @@ public class PartyView extends VBox{
         copy.setAccelerator(new KeyCharacterCombination("C",KeyCombination.SHORTCUT_DOWN));
         paste.setAccelerator(new KeyCharacterCombination("V",KeyCombination.SHORTCUT_DOWN));
         copy.setOnAction(event->{
-            //deck export code goes here
+            ClipboardContent content = new ClipboardContent();
+            
+            content.putString(getCurrentPartyBBCode());
+            clipboard.setContent(content);
         });
         paste.setOnAction(event->{
-            ArrayList<Character> chars=Character.allFromBBCode(clipboard.getString());
-
-            if(chars.size()>0){
-                pane1.setChar(chars.get(0));
-            }
-            if(chars.size()>1){
-                pane2.setChar(chars.get(1));
-            }
-            if(chars.size()>2){
-                pane3.setChar(chars.get(2));
-            }
+            setCurrentParty(clipboard.getString());
         });
-        copy.setDisable(true);
-        MenuBar menu=new MenuBar(new Menu("Edit",null,copy,paste));
+
+        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("Edit",null,copy,paste));
         ScrollPane scroll=new ScrollPane(new VBox(pane1,pane2,pane3));
         scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
         getChildren().addAll(menu,scroll);
+    }
+
+    private final Menu buildFileMenu(){
+        MenuItem load=new MenuItem("Load party...");
+        MenuItem save=new MenuItem("Save party as...");
+        load.setAccelerator(new KeyCharacterCombination("O",KeyCombination.SHORTCUT_DOWN));
+        save.setAccelerator(new KeyCharacterCombination("S",KeyCombination.SHORTCUT_DOWN));
+        load.setOnAction(event -> {
+            FileChooser fileChooser=new FileChooser();
+            fileChooser.setTitle("Choose party file...");
+            fileChooser.setInitialDirectory(
+                new File(Paths.get(System.getProperty("user.dir"),"saved","parties").toString())
+            );
+            loadPartyFrom(fileChooser.showOpenDialog(getStage()));
+        });
+        save.setOnAction(event -> {
+            FileChooser fileChooser=new FileChooser();
+            fileChooser.setTitle("Choose party file...");
+            fileChooser.setInitialDirectory(
+                new File(Paths.get(System.getProperty("user.dir"),"saved","parties").toString())
+            );
+            SavePartyTo(fileChooser.showSaveDialog(getStage()));
+        });
+
+        return new Menu("File",null,load,save);
+    }
+
+    private final Stage getStage(){
+        return (Stage) this.getScene().getWindow();
+    }
+    
+    private final String getCurrentPartyBBCode() {
+        try {
+            if (characterTemplate.isEmpty())
+                characterTemplate = FileUtils.textFromFile("templates/character.bbcode");
+        }
+        catch (FileNotFoundException ex) {
+            System.err.println("Uh oh - the character bbcode template wasn't there.");
+            characterTemplate = "Uh oh - the character bbcode template wasn't there.";
+        }
+
+        try {
+            if (itemTemplate.isEmpty())
+                itemTemplate = FileUtils.textFromFile("templates/item.bbcode");
+        }
+        catch (FileNotFoundException ex) {
+            System.err.println("Uh oh - the item bbcode template wasn't there.");
+            itemTemplate = "Uh oh - the item bbcode template wasn't there.";
+        }
+        
+        String partyBBCode = "";
+        for (Character c : getChars()) {
+            partyBBCode += String.format("%s%n%n", c.toBBCode(characterTemplate, itemTemplate));
+        }
+
+        return partyBBCode;
+    }
+    
+    private final void setCurrentParty(String bbCode) {
+        ArrayList<Character> chars=Character.allFromBBCode(bbCode);
+
+        setChars(chars);
+    }
+
+    private final void setChars(ArrayList<Character> chars){
+        if(chars.size()>0){
+            pane1.setChar(chars.get(0));
+        }
+
+        if(chars.size()>1){
+            pane2.setChar(chars.get(1));
+        }
+
+        if(chars.size()>2){
+            pane3.setChar(chars.get(2));
+        }
+    }
+
+    private final ArrayList<Character> getChars(){
+        ArrayList<Character> chars=new ArrayList<Character>();
+
+        CharPane[] panes=new CharPane[]{pane1,pane2,pane3};
+        for(CharPane p : panes){
+            CharPane.Char c=p.getChar();
+            String n=c.getName();
+            if(!(n==null||n.isEmpty())){
+                chars.add(c.asCharacter());
+            }
+        }
+        
+        return chars;
+    }
+    
+    public final void loadPartyFrom(File file) {
+        if(file!=null)
+            setCurrentParty(FileUtils.textFromFile(file));
+    }
+    
+    public final void SavePartyTo(File file) {
+        if(file!=null)
+            FileUtils.writeFile(file, getCurrentPartyBBCode());
     }
     
     //class responsible for representing a single equipped item
@@ -78,6 +179,14 @@ public class PartyView extends VBox{
             return (itemProperty.get()==item);
         }
 
+        public final boolean isEmpty() {
+            return itemProperty.get() == null;
+        }
+        
+        public final boolean isDefault() {
+            return itemProperty.get() == set.iterator().next().dfault;
+        }
+        
         public final void empty(){
             itemProperty.set(set.iterator().next().dfault);
         }
@@ -299,6 +408,65 @@ public class PartyView extends VBox{
                 setName(c.name);
 
                 Equip(c.equipment);
+            }
+
+            private Character asCharacter(){
+                Character c=new Character(
+                    this.getName(),this.getLevel(),
+                    this.getRace(),this.getRole(),"todo: image",this.getItems()
+                );
+
+                return c;
+            }
+
+            private Character.Race getRace(){
+                // HACK: Racial is 2 from the end.
+                Slot racialSlot=itemSlots[itemSlots.length-2];
+                Item.Slot type = racialSlot.getItem().slot;
+
+                switch(type){
+                    case Dwarf_Skill:
+                        return Character.Race.Dwarf;
+                    case Elf_Skill:
+                        return Character.Race.Elf;
+                    case Human_Skill:
+                        return Character.Race.Human;
+                    default:
+                        System.err.format("Weird - was looking at a racial skill slot, but got %s instead.", type);
+                        return Character.Race.Human;
+                }
+            }
+
+            private Character.Role getRole(){
+                // HACK: Second slot always contains a weapon.
+                Slot weaponSlot=itemSlots[1];
+                Item.Slot type = weaponSlot.getItem().slot;
+
+                switch(type){
+                    case Divine_Weapon:
+                        return Character.Role.Priest;
+                    case Weapon:
+                        return Character.Role.Warrior;
+                    case Staff:
+                        return Character.Role.Wizard;
+                    default:
+                        System.out.format("Weird - was looking at a weapon slot, but got %s instead.", type);
+                        return Character.Role.Warrior;
+                }
+            }
+
+            private Item[] getItems(){
+                ArrayList<Item> items = new ArrayList<Item>();
+                
+                for (Slot s : itemSlots)
+                {
+                   if (s != null && !s.isEmpty())
+                   {
+                       items.add(s.getItem());
+                   }
+                }
+                
+                return items.toArray(new Item[items.size()]);
             }
         }
     }
