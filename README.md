@@ -1,6 +1,35 @@
 # CardHunterUtils
 Deck manager and party builder utility for Card Hunter by Blue Manchu
 
+# What It Does
+* Complete listing of all items and cards in the game
+* Search and sort items by name, rarity, type, tokens, etc.
+* Import parties from the game/forum bbCode format (using `partybbcode` command)
+* Save/load parties
+* Generate an HTML view of item cards / all cards, for searching in card text
+
+# What It Looks Like
+
+## Party View
+<img width="1552" alt="partyview" src="https://cloud.githubusercontent.com/assets/750196/9563854/c2cc30dc-4e60-11e5-9d32-f518419be975.png">
+
+## Item Search/Filter
+<img width="1552" alt="filters" src="https://cloud.githubusercontent.com/assets/750196/9564090/befbb808-4e68-11e5-9007-025a2b7eaf98.png">
+
+## Item Card Inspector
+<img width="1524" alt="itemcards" src="https://cloud.githubusercontent.com/assets/750196/9564091/befe4690-4e68-11e5-82f7-6b7e0ad53ffc.png">
+
+## HTML Card Viewer
+<img width="1552" alt="allcards" src="https://cloud.githubusercontent.com/assets/750196/9564089/befac45c-4e68-11e5-987d-8dc8a73362ca.png">
+
+# What's Happening Now
+Check out the current issues list on [the Github page](https://github.com/Xayrn/CardHunterUtils/issues), or check out [the thread](http://forums.cardhunter.com/threads/card-hunter-utility-program.7377/) at the Card Hunter forums.
+
+# Can I Help?
+Yup.  See below for getting started as a developer.
+
+-----
+
 # Developer Setup
 
 ## For Windows:
