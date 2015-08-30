@@ -18,31 +18,11 @@ public class Character{
 
     public final static ObservableList<Character> roster=FXCollections.observableArrayList();
 
-    // <editor-fold defaultstate="collapsed" desc="Race and Role Enums">
-    public static enum Race{
-        Dwarf, Elf, Human;
-        private Race(){}
-        private static final Race[] values=values();
-        public static Race value(int i){
-            return values[i];
-        }
-    }
-
-    public static enum Role{
-        Priest, Warrior, Wizard;
-        private Role(){}
-        private static final Role[] values=values();
-        public static Role value(int i){
-            return values[i];
-        }
-    }
-    // </editor-fold>
-
     // <editor-fold defaultstate="collapsed" desc="Props and getters">
     public final String name;
     public final int level;
     public final Race race;
-    public final Role role;
+    public final Class role;
     public final Build equipment;
     public final Image figure;
 
@@ -58,7 +38,7 @@ public class Character{
         return race;
     }
 
-    public Role getRole(){
+    public Class getRole(){
         return role;
     }
 
@@ -72,7 +52,7 @@ public class Character{
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Constructor">
-    public Character(String name,int level,Race race,Role role,String image,Item... items){
+    public Character(String name,int level,Race race,Class role,String image,Item... items){
         this.name=name;
         this.level=level;
         this.race=race;
@@ -118,7 +98,7 @@ public class Character{
         String name=(m.find()) ? m.group(1) : "New Adventurer";
         int level = 1;
         Race race = Race.Human;
-        Role role = Role.Warrior;
+        Class role = Class.Warrior;
         
         String oWiki=Pattern.quote("[wiki]");
         String cWiki=Pattern.quote("[/wiki]");
@@ -127,7 +107,7 @@ public class Character{
         if (m.find()) {
             level = Integer.parseInt(m.group(1));
             race = Race.valueOf(m.group(2));
-            role = Role.valueOf(m.group(3));
+            role = Class.valueOf(m.group(3));
         }
 
         ArrayList<Item> items = new ArrayList<>();
