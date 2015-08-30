@@ -29,7 +29,7 @@ public class CardHunterUtils extends Application{
 		ObservableList<Card>cardList=FXCollections.observableArrayList();
 		ObservableList<Item>itemList=FXCollections.observableArrayList();
 		for(Data.Table.Row row:cardData)cardList.add(new Card(row));
-		for(Data.Table.Row row:itemData)itemList.add(new Item(row));
+		for(Data.Table.Row row:itemData)itemList.add(new Item(row,cardList));//fix this construction; very inefficient
 		
         ItemTable table=new ItemTable(itemList);//setup the user interface
         table.setPrefWidth(0);

@@ -1,4 +1,5 @@
-import card.hunter.Item;
+package card.hunter;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -7,8 +8,8 @@ public class Build{
 
     public final String name;
     public final int minLevel;
-    public final Character.Race race;
-    public final Character.Role role;
+    public final Race race;
+    public final Class role;
     public final ArrayList<Item> items;
 
     public String getName(){
@@ -19,11 +20,11 @@ public class Build{
         return minLevel;
     }
 
-    public Character.Race getRace(){
+    public Race getRace(){
         return race;
     }
 
-    public Character.Role getRole(){
+    public Class getRole(){
         return role;
     }
 
@@ -32,7 +33,7 @@ public class Build{
     }
 
     // </editor-fold>
-    public Build(String name,Character.Race race,Character.Role role,int minLevel,Item... items){
+    public Build(String name,Race race,Class role,int minLevel,Item... items){
         this.name=name;
         this.minLevel=minLevel;
         this.race=race;
