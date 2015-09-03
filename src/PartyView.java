@@ -1,5 +1,9 @@
 
 import app.App;
+import utils.FileUtils;
+import models.Character;
+import models.Build;
+import models.Item;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Paths;
@@ -37,6 +41,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import models.Hoard;
 
 //class responsible for building and displaying parties and their decks
 public class PartyView extends VBox{
@@ -79,8 +84,13 @@ public class PartyView extends VBox{
         paste.setOnAction(event->{
             setCurrentParty(clipboard.getString());
         });
+        
+        MenuItem pasteHoard=new MenuItem("Paste Hoard from Clipboard");
+        pasteHoard.setOnAction(event->{
+            Hoard.load(clipboard.getString());
+        });
 
-        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("View",null,viewCards,viewHtmlCards,openExternally,compareCardArt),new Menu("Edit",null,copy,paste));
+        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("View",null,viewCards),new Menu("Edit",null,copy,paste));
         ScrollPane scroll=new ScrollPane(new VBox(pane1,pane2,pane3));
         scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
         getChildren().addAll(menu,scroll);

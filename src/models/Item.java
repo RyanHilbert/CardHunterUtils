@@ -1,5 +1,9 @@
+package models;
 import app.App;
+import utils.CSV;
+import utils.AssetLoader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -80,6 +84,7 @@ public class Item{
             }
         }
     }
+    public final int id;
     public final String name;
     public final Rarity rarity;
     public final byte level;
@@ -89,6 +94,7 @@ public class Item{
     public final Set set;
     public final Image icon;
     
+    public int getId(){return id;}
     public String getName(){return name;}
     public Rarity getRarity(){return rarity;}
     public byte getLevel(){return level;}
@@ -113,7 +119,8 @@ public class Item{
         if(card6!=null)children.add(card6.getThumbnail());
         return hbox;
     }
-    private Item(String name,Rarity rarity,byte level,Token token1,Token token2,Card card1,Card card2,Card card3,Card card4,Card card5,Card card6,Slot slot,String image,Set set){
+    private Item(int id,String name,Rarity rarity,byte level,Token token1,Token token2,Card card1,Card card2,Card card3,Card card4,Card card5,Card card6,Slot slot,String image,Set set){
+        this.id=id;
         this.name=name;
         this.rarity=rarity;
         this.level=level;
@@ -137,7 +144,7 @@ public class Item{
         byte token2=0;//must handle empty string and -1
         try{token2=Byte.parseByte(0+s[8]);}
         catch(NumberFormatException e){}
-        return new Item(s[1],
+        return new Item(Integer.parseInt(s[0],10),s[1],
                 Rarity.valueOf(s[3]),
                 Byte.parseByte(s[4]),
                 Token.value(Byte.parseByte(0+s[7])),
@@ -212,5 +219,30 @@ public class Item{
         return String.join("\", \"", cards.toArray(new String[cards.size()]));
     }
     
+    
+    public static Item byId(int id){
+        for(Item i : list){
+            if(i.id == id){
+                return i;
+            }
+        }
+
+        return null;
+    }
+    
+    public static ArrayList<Item> byName(int... ids){
+        ArrayList<Item> retVal = new ArrayList<>(ids.length);
+        
+        for(int n : ids)
+            retVal.add(Item.byId(n));
+
+        return retVal;
+    }
+
+    //public static Item EmptyItem=new Item("_",Rarity.Common,(byte) 0,Token.None,Token.None,null,null,null,null,null,null,Slot.Boots,"",Set.Base);
+    public static Comparator<Item> nameComparer=(a,b) -> {
+        return a.name.compareTo(b.name);
+    };
+
     @Override public String toString(){return name;}
 }
