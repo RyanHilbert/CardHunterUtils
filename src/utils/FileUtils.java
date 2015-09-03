@@ -1,3 +1,5 @@
+package utils;
+
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,7 +42,7 @@ public class FileUtils{
         return sb.toString();
     }
 
-    static void writeFile(File file, String text) {
+    public static void writeFile(File file, String text) {
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getPath()), "utf-8"))) {
             writer.write(text);
         } catch (IOException ex) {

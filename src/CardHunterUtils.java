@@ -1,3 +1,5 @@
+import models.Card;
+import models.Item;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
@@ -10,17 +12,24 @@ import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
+import models.Hoard;
+import ui.CardViewer;
+import utils.AssetLoader;
+import utils.FileUtils;
 
 public class CardHunterUtils extends Application{
     public static void main(String...args){launch(args);}
     
     private PartyView party;
     private File partyFile;
+    private File hoardFile;
     
     @Override
     public void start(Stage stage) throws Exception{
         File partiesDir=new File(Paths.get(System.getProperty("user.dir"),"saved","parties").toString());
         partiesDir.mkdirs();
+        File hoardsDir=new File(Paths.get(System.getProperty("user.dir"),"saved","hoards").toString());
+        hoardsDir.mkdirs();
 
         File cardDir=new File("data/gameplay/Cards"),itemDir=new File("data/gameplay/Equipment");
         cardDir.mkdirs();//create all necessary directories...
@@ -48,7 +57,12 @@ public class CardHunterUtils extends Application{
         }
         
         AssetLoader.setupJSON();        
-        
+
+        hoardFile=new File(hoardsDir,"current.hoard");
+        if(hoardFile.isFile()){
+            Hoard.load(FileUtils.textFromFile(hoardFile));
+        }
+
         ItemTable table=new ItemTable();//setup the user interface
         table.setPrefWidth(0);
         HBox.setHgrow(table,Priority.ALWAYS);
@@ -63,6 +77,7 @@ public class CardHunterUtils extends Application{
                 slot.setItem(item);
             }
         };
+		
         party.onSlotRightClick=slot -> {
             new CardViewer(slot.itemProperty.getValue()).show(stage);
         };
@@ -85,5 +100,9 @@ public class CardHunterUtils extends Application{
         
         if (party != null && partyFile != null)
             party.savePartyTo(partyFile);
+
+        if(hoardFile!=null){
+            FileUtils.writeFile(hoardFile,Hoard.toText());
+        }
     }
 }

@@ -1,3 +1,6 @@
+package models;
+
+import utils.AssetLoader;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

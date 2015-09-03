@@ -1,3 +1,6 @@
+package models;
+
+import models.Item;
 import java.util.ArrayList;
 import java.util.Iterator;
 

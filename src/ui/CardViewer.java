@@ -1,3 +1,4 @@
+package ui;
 
 import app.App;
 import java.io.File;
@@ -5,7 +6,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import ui.WebBrowser;
+import models.Item;
+import utils.FileUtils;
 
 public class CardViewer {
     private Item item;
