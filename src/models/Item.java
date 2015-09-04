@@ -93,6 +93,7 @@ public class Item{
     public final Slot slot;
     public final Set set;
     public final Image icon;
+    public final int totalDamage;
     
     public int getId(){return id;}
     public String getName(){return name;}
@@ -103,6 +104,7 @@ public class Item{
     public Slot getSlot(){return slot;}
     public Set getSet(){return set;}
     public Image getIcon(){return icon;}
+    public int getTotalDamage() { return totalDamage; }
     public ImageView getView(){ImageView view=new ImageView(icon);view.setOnMouseClicked(e->System.out.println("Test"));return view;}
     public Token.View getPrimaryTokenView(){return token1.getView();}
     public Token.View getSecondaryTokenView(){return token2.getView();}
@@ -119,6 +121,15 @@ public class Item{
         if(card6!=null)children.add(card6.getThumbnail());
         return hbox;
     }
+
+    public int getQuantity(){
+        return Hoard.countOf(this);
+    }
+
+    public int getNumInUse(){
+        return Party.count(this);
+    }
+
     private Item(int id,String name,Rarity rarity,byte level,Token token1,Token token2,Card card1,Card card2,Card card3,Card card4,Card card5,Card card6,Slot slot,String image,Set set){
         this.id=id;
         this.name=name;
@@ -126,12 +137,26 @@ public class Item{
         this.level=level;
         this.token1=token1;
         this.token2=token2;
+        int d = 0;
         this.card1=card1;
+        if (this.card1 != null)
+            d += this.card1.damage;
         this.card2=card2;
+        if (this.card2 != null)
+            d += this.card2.damage;
         this.card3=card3;
+        if (this.card3 != null)
+            d += this.card3.damage;
         this.card4=card4;
+        if (this.card4 != null)
+            d += this.card4.damage;
         this.card5=card5;
+        if (this.card5 != null)
+            d += this.card5.damage;
         this.card6=card6;
+        if (this.card6 != null)
+            d += this.card6.damage;
+        this.totalDamage = d;
         this.slot=slot;
         this.set=set;
         this.icon=AssetLoader.loadImage(AssetLoader.ImageType.Item_Illustrations,image);

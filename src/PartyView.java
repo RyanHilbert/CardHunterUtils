@@ -14,7 +14,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
@@ -42,6 +41,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.Hoard;
+import models.Party;
 
 //class responsible for building and displaying parties and their decks
 public class PartyView extends VBox{
@@ -205,7 +205,13 @@ public class PartyView extends VBox{
         public final ObjectProperty<Item>itemProperty(){return itemProperty;}
         public final Item getItem(){return itemProperty.get();}
         public final void setItem(Item item){
+            if(!isEmpty()&&!isDefault()){
+                Party.remove(itemProperty.get());
+            }
             itemProperty.set(item);
+            Party.add(item);
+            
+            App.state().refresh();
         }
 
         public final boolean isHolding(Item item){
@@ -221,7 +227,7 @@ public class PartyView extends VBox{
         }
         
         public final void empty(){
-            itemProperty.set(set.iterator().next().dfault);
+            setItem(set.iterator().next().dfault);
         }
         public final ObjectProperty<Item>itemProperty=new SimpleObjectProperty<Item>(){
             @Override public void setValue(Item item){set(item);}

@@ -1,3 +1,4 @@
+import app.App;
 import models.Card;
 import models.Item;
 import java.io.File;
@@ -13,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import models.Hoard;
+import ui.ViewState;
 import utils.FileUtils;
 
 public class CardHunterUtils extends Application{
@@ -21,12 +23,15 @@ public class CardHunterUtils extends Application{
     private PartyView party;
     private File partyFile;
     private File hoardFile;
+    private File viewState;
     
     @Override
     public void start(Stage stage) throws Exception{
-        File partiesDir=new File(Paths.get(System.getProperty("user.dir"),"saved","parties").toString());
+        String savePath = Paths.get(System.getProperty("user.dir"),"saved").toString();
+        File saveDir = new File(savePath);
+        File partiesDir=new File(Paths.get(savePath,"parties").toString());
         partiesDir.mkdirs();
-        File hoardsDir=new File(Paths.get(System.getProperty("user.dir"),"saved","hoards").toString());
+        File hoardsDir=new File(Paths.get(savePath,"hoards").toString());
         hoardsDir.mkdirs();
 
         File cardDir=new File("data/gameplay/Cards"),itemDir=new File("data/gameplay/Equipment");
@@ -57,6 +62,11 @@ public class CardHunterUtils extends Application{
         AssetLoader.setupJSON();        
         
 
+        
+        viewState = new File(saveDir, "view.prefs");
+        if(viewState.isFile())
+            App.state().viewState = ViewState.loadFrom(FileUtils.textFromFile(viewState));
+        
         hoardFile=new File(hoardsDir,"current.hoard");
         if(hoardFile.isFile()){
             Hoard.load(FileUtils.textFromFile(hoardFile));
@@ -65,6 +75,8 @@ public class CardHunterUtils extends Application{
         ItemTable table=new ItemTable();//setup the user interface
         table.setPrefWidth(0);
         HBox.setHgrow(table,Priority.ALWAYS);
+        
+        App.state().register(table);
         
         party=new PartyView();
         party.onSlotClick=slot -> {
@@ -83,6 +95,9 @@ public class CardHunterUtils extends Application{
         partyFile=new File(partiesDir,"currentParty.bbcode");
         if(partyFile.isFile())
             party.loadPartyFrom(partyFile);
+
+        table.refresh();
+        table.setViewFromState();
         
         stage.setTitle("Card Hunter Utility Program");
         stage.setScene(new Scene(new HBox(party,table),1000,750));
@@ -101,6 +116,11 @@ public class CardHunterUtils extends Application{
 
         if(hoardFile!=null){
             FileUtils.writeFile(hoardFile,Hoard.toText());
+        }
+        
+        if (viewState != null) {
+            App.state().updateViewState();
+            FileUtils.writeFile(viewState, App.state().viewState.saveToText());
         }
     }
 }
