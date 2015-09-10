@@ -5,6 +5,7 @@ import utils.CSV;
 import utils.AssetLoader;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -95,6 +96,7 @@ public class Item{
     public final Set set;
     public final Image icon;
     public final int totalDamage;
+    private final HashMap<CalculatedProperties.Names, Integer> cardProps = new HashMap<>();
     
     public int getId(){return id;}
     public String getName(){return name;}
@@ -106,6 +108,9 @@ public class Item{
     public Set getSet(){return set;}
     public Image getIcon(){return icon;}
     public int getTotalDamage() { return totalDamage; }
+    public final int getCardProp(CalculatedProperties.Names name) { 
+        return cardProps.get(name); 
+    }
     public ImageView getView(){ImageView view=new ImageView(icon);view.setOnMouseClicked(e->System.out.println("Test"));return view;}
     public Token.View getPrimaryTokenView(){return token1.getView();}
     public Token.View getSecondaryTokenView(){return token2.getView();}
@@ -138,32 +143,36 @@ public class Item{
         this.level=level;
         this.token1=token1;
         this.token2=token2;
-        int d = 0;
         this.card1=card1;
-        if (this.card1 != null)
-            d += this.card1.damage;
         this.card2=card2;
-        if (this.card2 != null)
-            d += this.card2.damage;
         this.card3=card3;
-        if (this.card3 != null)
-            d += this.card3.damage;
         this.card4=card4;
-        if (this.card4 != null)
-            d += this.card4.damage;
         this.card5=card5;
-        if (this.card5 != null)
-            d += this.card5.damage;
         this.card6=card6;
-        if (this.card6 != null)
-            d += this.card6.damage;
-        this.totalDamage = d;
+        this.calculateCardProps();
+        this.totalDamage = this.getCardProp(CalculatedProperties.Names.Damage);
         this.slot=slot;
         this.set=set;
         this.icon=AssetLoader.loadImage(AssetLoader.ImageType.Item_Illustrations,image);
         if(image.contains("Default Item"))slot.dfault=this;
         list.add(this);
     }
+    
+    private void calculateCardProps() {
+        for (CalculatedProperties.Names prop : CalculatedProperties.Names.values())
+            if (prop.isCardDriven())
+                cardProps.put(prop, CalculatedProperties.calc(prop, this));
+    }
+    
+    // TODO: Get this to be observable instead of public static :/
+    // Basically, fix the initialization timing so that this happens on Party/Hoard load
+    public static void CalculateStateDependentItemProps() {
+        for (Item item : list)
+            for (CalculatedProperties.Names prop : CalculatedProperties.Names.values())
+                if (prop.isStateDriven())
+                    item.cardProps.put(prop, CalculatedProperties.calc(prop, item));
+    }
+    
     //passes CSV data into the Item constructor
     public static Item fromCSV(String string){
         String[]s=CSV.tokenizeLine(string);
