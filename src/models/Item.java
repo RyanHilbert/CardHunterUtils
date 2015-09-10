@@ -4,6 +4,7 @@ import utils.CSV;
 import utils.AssetLoader;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -94,6 +95,7 @@ public class Item{
     public final Set set;
     public final Image icon;
     public final int totalDamage;
+    private final HashMap<String, Integer> cardProps = new HashMap<>();
     
     public int getId(){return id;}
     public String getName(){return name;}
@@ -105,6 +107,7 @@ public class Item{
     public Set getSet(){return set;}
     public Image getIcon(){return icon;}
     public int getTotalDamage() { return totalDamage; }
+    public int getCardProp(String name) { return cardProps.get(name); }
     public ImageView getView(){ImageView view=new ImageView(icon);view.setOnMouseClicked(e->System.out.println("Test"));return view;}
     public Token.View getPrimaryTokenView(){return token1.getView();}
     public Token.View getSecondaryTokenView(){return token2.getView();}
@@ -157,12 +160,19 @@ public class Item{
         if (this.card6 != null)
             d += this.card6.damage;
         this.totalDamage = d;
+        this.calculateCardProps();
         this.slot=slot;
         this.set=set;
         this.icon=AssetLoader.loadImage(AssetLoader.ImageType.Item_Illustrations,image);
         if(image.contains("Default Item"))slot.dfault=this;
         list.add(this);
     }
+    
+    private void calculateCardProps() {
+        for (String name : CalculatedProperties.getProps())
+            cardProps.put(name, CalculatedProperties.calc(name, this));
+    }
+    
     //passes CSV data into the Item constructor
     public static Item fromCSV(String string){
         String[]s=CSV.tokenizeLine(string);

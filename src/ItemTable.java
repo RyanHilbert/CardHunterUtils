@@ -21,7 +21,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 import ui.IPersistViewState;
 import utils.Formula;
 
@@ -31,6 +30,7 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
     private final static String SORT_DIRECTIONS = "sortDirections";
     
     private final List<TableColumn<Item, ?>> orderedColumns = new ArrayList<>();
+    private final List<TableColumn<Item, ?>> calculatedColumns = new ArrayList<>();
     private final List<EnumFilter> enumFilters = new ArrayList<>();
     private final List<TextField> textFilters = new ArrayList<>();
     
@@ -51,6 +51,14 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         TableColumn<Item,Integer> qtyCol=new TableColumn<>("Qty");
         TableColumn<Item,Integer> usedCol=new TableColumn<>("In Use");
         TableColumn<Item,Integer> damageCol=new TableColumn<>("Damage");
+        for (String name : CalculatedProperties.getProps()) {
+            TableColumn<Item, Integer> col = new TableColumn<>(name);
+            col.setCellValueFactory(cell -> new ReadOnlyObjectWrapper(((Item) cell.getValue()).getCardProp(name)));
+            TextField textFilter = new TextField();
+            textFilter.setId(name + "Filter");
+            //textFilters.add(textFilter);
+            calculatedColumns.add(col);
+        }
         
         iconCol.setCellValueFactory(new PropertyValueFactory<>("view"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -138,6 +146,13 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
             header.setOnMouseEntered(event-> { this.inHeader = true; });
             header.setOnMouseExited(event-> { this.inHeader = false; });
         }
+        orderedColumns.add(damageCol);
+        
+        for (TableColumn<Item,?> c : calculatedColumns)
+            orderedColumns.add(c);
+        
+        for (TableColumn<Item,?> c : orderedColumns)
+            columns.add(c);
     }
 
     @Override
