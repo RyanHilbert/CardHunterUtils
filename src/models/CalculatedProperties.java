@@ -9,21 +9,65 @@ import models.Card.AttackType;
 import models.Card.Type;
 
 public class CalculatedProperties {
-    private static String[] props = new String[] { "VampDamage", "StepMoves" };
+    public enum Names { 
+        
+        Damage,Qty,InUse,VampDamage,StepMoves;
     
-    public static List<String> getProps() { 
-        return Arrays.asList(props);
+        public boolean isStateDriven() {
+            return isStateDriven(this);
+        }
+        
+        public static boolean isStateDriven(Names name) {
+            switch (name) {
+                case Qty:
+                case InUse:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        
+        public boolean isCardDriven() {
+            return isCardDriven(this);
+        }
+        
+        public static boolean isCardDriven(Names name) {
+            return !isStateDriven(name);
+        }
     }
+//    
+//    public static String[] getNames(Class<? extends Enum<?>> e) {
+//        return Arrays.stream(e.getEnumConstants()).map(Enum::name).toArray(String[]::new);
+//    }
+//    
+//    public static List<String> getProps() { 
+//        return Arrays.asList(getNames(Names.class));
+//    }
     
-    public static int calc(String name, Item item) {
+    
+    
+    
+    public static int calc(Names name, Item item) {
         switch (name) {
-            case "VampDamage":
+            case Damage:
+                return invoke(Damage::calc, item, Op.Sum);
+            case Qty:
+                return item.getQuantity();
+            case InUse:
+                return item.getNumInUse();
+            case VampDamage:
                 return invoke(VampDamage::calc, item, Op.Sum);
-            case "StepMoves":
+            case StepMoves:
                 return invoke(StepMoves::calc, item, Op.Sum);
         }
         
         return 0;
+    }
+    
+    public static class Damage { // implements ICalculatedCardProperty {
+        public static int calc(Card card) {
+            return (card.type1 == Type.Attack || card.type2 == Type.Attack) ? card.damage : 0;
+        }
     }
     
     public static class VampDamage { // implements ICalculatedCardProperty {
