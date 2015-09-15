@@ -97,7 +97,7 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         
         InvalidationListener nameListener=observable-> {
                 String f = nameFilter.getText();
-                boolean isSet = (f != null && !filter.isEmpty());
+                boolean isSet = (f != null && !f.isEmpty());
                 
                 nameCol.setStyle(isSet ? "-fx-background-color: #DFD; -fx-text-fill: green; -fx-font-weight: bold;" : "");
             };
