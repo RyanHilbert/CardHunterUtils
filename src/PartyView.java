@@ -42,6 +42,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.Hoard;
 import models.Party;
+import ui.MouseHelper;
 
 //class responsible for building and displaying parties and their decks
 public class PartyView extends VBox{
@@ -90,7 +91,7 @@ public class PartyView extends VBox{
             Hoard.load(clipboard.getString());
         });
 
-        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("View",null,viewCards),new Menu("Edit",null,copy,paste));
+        MenuBar menu=new MenuBar(buildFileMenu(),new Menu("View",null,viewCards,viewHtmlCards,openExternally,compareCardArt),new Menu("Edit",null,copy,paste,pasteHoard));
         ScrollPane scroll=new ScrollPane(new VBox(pane1,pane2,pane3));
         scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
         getChildren().addAll(menu,scroll);

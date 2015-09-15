@@ -1,3 +1,7 @@
+package models; 
+
+import models.Card;
+
 public class Action {
     public final String text,flavorText,fullText,iconLeft,iconRight;
     public final byte amountLeft,amountRight;

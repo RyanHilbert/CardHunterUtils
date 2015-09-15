@@ -15,6 +15,7 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import models.Hoard;
 import ui.ViewState;
+import utils.AssetLoader;
 import utils.FileUtils;
 
 public class CardHunterUtils extends Application{
@@ -60,8 +61,6 @@ public class CardHunterUtils extends Application{
         }
         
         AssetLoader.setupJSON();        
-        
-
         
         viewState = new File(saveDir, "view.prefs");
         if(viewState.isFile())

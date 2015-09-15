@@ -1,4 +1,3 @@
-import utils.EnumFilter;
 import app.App;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,10 +20,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
+import models.CalculatedProperties;
 import ui.IPersistViewState;
+import ui.MouseHelper;
 import utils.Formula;
 
 public class ItemTable extends TableView<Item> implements IPersistViewState{
+    private boolean inHeader = false;
+    private final static String CONTROL_NAME = "ITEM_TABLE";
     private final static String COL_ORDER = "columnOrder";
     private final static String SORTED_COLUMNS = "sortedColumns";
     private final static String SORT_DIRECTIONS = "sortDirections";
@@ -106,6 +110,7 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
             &&setFilter.set.contains(item.set)
             &&item.name.toLowerCase().contains(nameFilter.getText() != null ? nameFilter.getText().toLowerCase() : "")
             &&evalCalculatedFilters(item));
+        
         rarityFilter.set.addListener(listener);
         tokenFilter.set.addListener(listener);
         slotFilter.set.addListener(listener);
@@ -158,18 +163,6 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         orderedColumns.add(cardCol);
         orderedColumns.add(slotCol);
         orderedColumns.add(setCol);
-            if(MouseHelper.isRightClick(event) && !inHeader)
-                new CardViewer(this.getSelectionModel().getSelectedItem()).show((Stage) this.getScene().getWindow());
-        });
-    }
-    
-            columns.add(c);
-        final Node header = this.lookup("TableHeaderRow");
-        if (header != null) {
-            header.setOnMouseEntered(event-> { this.inHeader = true; });
-            header.setOnMouseExited(event-> { this.inHeader = false; });
-        }
-        orderedColumns.add(damageCol);
         //orderedColumns.add(damageCol);
         
         for (TableColumn<Item,?> c : calculatedColumns)
@@ -177,6 +170,20 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         
         for (TableColumn<Item,?> c : orderedColumns)
             columns.add(c);
+        
+        setOnMouseClicked(event->{
+            if(MouseHelper.isRightClick(event) && !inHeader)
+            new CardViewer(this.getSelectionModel().getSelectedItem()).show((Stage) this.getScene().getWindow());
+        });
+    }
+    
+    public void onShow() {
+        // HACK: poor man's event suppression
+        final Node header = this.lookup("TableHeaderRow");
+        if (header != null) {
+            header.setOnMouseEntered(event-> { this.inHeader = true; });
+            header.setOnMouseExited(event-> { this.inHeader = false; });
+        }
     }
 
     @Override

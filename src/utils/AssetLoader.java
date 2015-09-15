@@ -14,6 +14,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.media.AudioClip;
 import javax.imageio.ImageIO;
+import models.Card;
 
 public final class AssetLoader{
     
