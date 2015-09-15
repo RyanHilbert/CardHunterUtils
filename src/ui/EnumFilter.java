@@ -64,6 +64,21 @@ public class EnumFilter<E extends Enum<E>>extends VBox implements IPersistViewSt
         String checkState = String.join(",", checks);
         App.state().viewState.saveControlSetting(type.getName(), "filter", checkState);
     }
+    
+    public boolean isUnset() {
+        return !isSet();
+    }
+    
+    public boolean isSet() {
+        for(Node n : getChildren()) {
+            CheckBox box=(CheckBox) n;
+            
+            if (box != null && !box.isSelected())
+                return true;
+        }
+        
+        return false;
+    }
 
     @Override
     public void refresh() {
