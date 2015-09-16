@@ -1,60 +1,48 @@
 package card.hunter;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
-public enum Token implements Viewable{
-	None,Minor,Major,Great,Ultimate;
+public enum Token implements ViewableEnum<Token>{
+	Base,Minor,Major,Great,Ultimate;
 	
 	private static final Token[]values=values();
 	
-	public final Image image=new Image("card/"+toString()+".png");
-	
 	public static Token valueOf(int i){
-		return i==-1?None:values[i];
-	}
-	@Override public View view(){
-		return new View();
+		return i==-1?Base:values[i];
 	}
 	public Pair pair(Token token){
-		return new Pair(token);
+		return Pair.valueOf(this,token);
 	}
-	public class View extends ImageView implements Comparable<View>{
-		
-		public final Token token=Token.this;
-		
-		public View(){
-			super(Token.this.image);
-		}
-		@Override public int compareTo(View view){
-			return token.compareTo(view.token);
-		}
-	}
-	public class Pair implements Viewable,Comparable<Pair>{
+	public enum Pair implements Viewable{
+
+		Base_Base,Minor_Base,Minor_Minor,Major_Base,Major_Minor,Major_Major;
+
 		public final Token greater,lesser;
-		public Pair(Token token){
-			if(Token.this.compareTo(token)<0){
-				greater=token;
-				lesser=Token.this;
-			}else{
-				greater=Token.this;
-				lesser=token;
+
+		Pair(){
+			final String[]strings = super.toString().split("_");
+			this.greater = Token.valueOf(strings[0]);
+			this.lesser = Token.valueOf(strings[1]);
+		}
+		public static Pair valueOf(Token greater,Token lesser){
+			if (greater.compareTo(lesser)<0){
+				final Token temp=greater;
+				greater=lesser;
+				lesser=temp;
 			}
+			return valueOf(greater+"_"+lesser);
 		}
-		@Override public int compareTo(Pair pair) {
-			final int comparison=greater.compareTo(pair.greater);
-			return comparison!=0?comparison:lesser.compareTo(pair.lesser);
-		}
-		@Override public View view(){
+		@Override public View getView(){
 			return new View();
 		}
-		public class View extends VBox implements Comparable<View>{
+		public class View extends VBox implements Comparable<View> {
+
 			public final Pair pair=Pair.this;
+
 			public View(){
-				super(Pair.this.greater.view(),Pair.this.lesser.view());
+				super(greater.getView(),lesser.getView());
 			}
-			@Override public int compareTo(View view) {
+			@Override public int compareTo(View view){
 				return pair.compareTo(view.pair);
 			}
 		}

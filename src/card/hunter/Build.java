@@ -9,8 +9,8 @@ public class Build{
     public final String name;
     public final int minLevel;
     public final Race race;
-    public final Class role;
-    public final ArrayList<Item> items;
+    public final Character role;
+    public final ArrayList<Equipment> items;
 
     public String getName(){
         return name;
@@ -24,22 +24,22 @@ public class Build{
         return race;
     }
 
-    public Class getRole(){
+    public Character getRole(){
         return role;
     }
 
-    public Iterator<Item> getItems(){
+    public Iterator<Equipment> getItems(){
         return items.iterator();
     }
 
     // </editor-fold>
-    public Build(String name,Race race,Class role,int minLevel,Item... items){
+    public Build(String name,Race race,Character role,int minLevel,Equipment... items){
         this.name=name;
         this.minLevel=minLevel;
         this.race=race;
         this.role=role;
-        this.items=new ArrayList<Item>(12);
-        for(Item i : items){
+        this.items=new ArrayList<Equipment>(12);
+        for(Equipment i : items){
             this.items.add(i);
         }
     }
