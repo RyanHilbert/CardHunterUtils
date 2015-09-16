@@ -9,6 +9,13 @@ import models.Set;
 import models.Item;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+
+import card.hunter.Equipment;
+import card.hunter.Rarity;
+import card.hunter.Set;
+import card.hunter.Slot;
+import card.hunter.Token;
+import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -29,7 +36,7 @@ import ui.CardViewer;
 import ui.MouseHelper;
 import utils.Formula;
 
-public class ItemTable extends TableView<Item> implements IPersistViewState{
+public class ItemTable extends TableView<Equipment> implements IPersistViewState{
     private boolean inHeader = false;
 	
     private final static String CONTROL_NAME = "ITEM_TABLE";
@@ -43,20 +50,20 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
     private final List<TextField> textFilters = new ArrayList<>();
     private final HashMap<CalculatedProperties.Names, TextField> calculatedFilters = new HashMap<>();
     
-    public ItemTable(){
-        final FilteredList<Item>filter=new FilteredList<>(Item.list,item->true);
-        final SortedList<Item>sorter=new SortedList<>(filter);
+    public ItemTable(ObservableList<Equipment>list){
+        final FilteredList<Equipment>filter=new FilteredList<>(list,item->true);
+        final SortedList<Equipment>sorter=new SortedList<>(filter);
         sorter.comparatorProperty().bind(comparatorProperty());
         setItems(sorter);
         
-        TableColumn<Item,ImageView>iconCol=new TableColumn<>("Icon");
-        TableColumn<Item,String>nameCol=new TableColumn<>("Name");
-        TableColumn<Item,Rarity>rarityCol=new TableColumn<>("Rarity");
-        TableColumn<Item,Byte>levelCol=new TableColumn<>("Lv");
-        TableColumn<Item,Item.Token.Pair.HView>tokenCol=new TableColumn<>("Tokens");
-        TableColumn<Item,HBox>cardCol=new TableColumn<>("Cards");
-        TableColumn<Item,Item.Slot>slotCol=new TableColumn<>("Slot");
-        TableColumn<Item,Set>setCol=new TableColumn<>("Set");
+        TableColumn<Equipment,ImageView>iconCol=new TableColumn<>("Icon");
+        TableColumn<Equipment,String>nameCol=new TableColumn<>("Name");
+        TableColumn<Equipment,Rarity>rarityCol=new TableColumn<>("Rarity");
+        TableColumn<Equipment,Byte>levelCol=new TableColumn<>("Lv");
+        TableColumn<Equipment,Token.Pair.View>tokenCol=new TableColumn<>("Tk");
+        TableColumn<Equipment,HBox>cardCol=new TableColumn<>("Cards");
+        TableColumn<Equipment,Slot>slotCol=new TableColumn<>("Slot");
+        TableColumn<Equipment,Set>setCol=new TableColumn<>("Set");
 
         for (CalculatedProperties.Names name : CalculatedProperties.Names.values()) {
             TableColumn<Item, Integer> col = new TableColumn<>(name.toString());
@@ -81,14 +88,14 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         rarityCol.setCellValueFactory(new PropertyValueFactory<>("rarity"));
         levelCol.setCellValueFactory(new PropertyValueFactory<>("level"));
-        tokenCol.setCellValueFactory(new PropertyValueFactory<>("tokenHView"));
+        tokenCol.setCellValueFactory(new PropertyValueFactory<>("tokenView"));
         cardCol.setCellValueFactory(new PropertyValueFactory<>("cardView"));
         slotCol.setCellValueFactory(new PropertyValueFactory<>("slot"));
         setCol.setCellValueFactory(new PropertyValueFactory<>("set"));
         
         EnumFilter<Rarity>rarityFilter=new EnumFilter<>(Rarity.class);
-        EnumFilter<Item.Token.Pair>tokenFilter=new EnumFilter<>(Item.Token.Pair.class);
-        EnumFilter<Item.Slot>slotFilter=new EnumFilter<>(Item.Slot.class);
+        EnumFilter<Token.Pair>tokenFilter=new EnumFilter<>(Token.Pair.class);
+        EnumFilter<Slot>slotFilter=new EnumFilter<>(Slot.class);
         EnumFilter<Set>setFilter=new EnumFilter<>(Set.class);
         TextField nameFilter=new TextField();
         nameFilter.setId("nameFilter");
@@ -109,7 +116,7 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         
         InvalidationListener listener=observable->filter.setPredicate(item->
             rarityFilter.set.contains(item.rarity)
-            &&tokenFilter.set.contains(Item.Token.Pair.get(item.token1,item.token2))
+                &&tokenFilter.set.contains(Token.Pair.valueOf(item.token1,item.token2))
             &&slotFilter.set.contains(item.slot)
             &&setFilter.set.contains(item.set)
             &&item.name.toLowerCase().contains(nameFilter.getText() != null ? nameFilter.getText().toLowerCase() : "")
@@ -153,7 +160,7 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         
         iconCol.setSortable(false);
         cardCol.setSortable(false);
-        ObservableList<TableColumn<Item,?>>columns=getColumns();
+        ObservableList<TableColumn<Equipment,?>>columns=getColumns();
 
         // TODO: figure out a way to statically order the calculated prop columns
         orderedColumns.add(iconCol);

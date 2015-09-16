@@ -1,8 +1,37 @@
 package card.hunter;
 
 public enum Slot{
-	Arcane_Item,Arcane_Skill,Boots,Divine_Armor,Divine_Item,Divine_Skill,Divine_Weapon,Dwarf_Skill,Elf_Skill,Heavy_Armor,Helmet,Human_Skill,Martial_Skill,Robes,Shield,Staff,Treasure,Weapon;
-	public Item dfault;//hack used to give each slot a default item value during the global item list initialization
-	public static Slot fromString(String string){return valueOf(string.replace(' ','_'));}
-	@Override public String toString(){return super.toString().replace('_',' ');}
+	Treasure(0),
+	Weapon(364),
+	Staff(365),
+	Shield(366),
+	Heavy_Armor(367),
+	Helmet(368),
+	Boots(369),
+	Arcane_Item(370),
+	Divine_Weapon(371),
+	Robes(372),
+	Divine_Armor(373),
+	Divine_Item(374),
+	Arcane_Skill(100148),
+	Divine_Skill(100149),
+	Martial_Skill(100150),
+	Elf_Skill(100151),
+	Human_Skill(100152),
+	Dwarf_Skill(100153);
+	
+	private final int id;
+	
+	Slot(int id){
+		this.id=id;
+	}
+	public Equipment getDefaultEquipment(){
+		return Equipment.idMap().get(id);
+	}
+	public static Slot fromString(String string){
+		return valueOf(string.replace(' ','_'));
+	}
+	@Override public String toString(){
+		return super.toString().replace('_',' ');
+	}
 }
