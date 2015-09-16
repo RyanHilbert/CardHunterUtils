@@ -1,7 +1,5 @@
 package card.hunter;
 
-public enum Rarity{
-    Common,Uncommon,Rare,Epic,Legendary;
-    private final static Rarity[]values=Rarity.values();
-    public static Rarity valueOf(int i){return values[i];}
+public enum Rarity implements ViewableEnum<Rarity>{
+    Base,Common,Uncommon,Rare,Epic,Legendary;
 }

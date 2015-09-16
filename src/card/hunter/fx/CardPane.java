@@ -10,7 +10,7 @@ public class CardPane extends ScrollPane{
     public CardPane(){
         FlowPane flow=new FlowPane();
         ObservableList<Node>children=flow.getChildren();
-        for(Card card:Card.map.values()){children.add(card.getThumbnail());}
+        for(Card card:Card.list()){children.add(card.getView());}
         setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
         setFitToWidth(true);
         setContent(flow);
