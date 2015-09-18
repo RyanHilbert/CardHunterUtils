@@ -1,7 +1,7 @@
 package models;
 
-import models.Item;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Build{
@@ -39,10 +39,8 @@ public class Build{
         this.minLevel=minLevel;
         this.race=race;
         this.role=role;
-        this.items=new ArrayList<Item>(12);
-        for(Item i : items){
-            this.items.add(i);
-        }
+        this.items=new ArrayList<>(12);
+        this.items.addAll(Arrays.asList(items));
     }
 
     public static boolean areIdentical(Build a,Build b){
