@@ -1,3 +1,5 @@
+package models;
+
 public class Trigger {
     public final Integer trigger;
     public final Integer keep;

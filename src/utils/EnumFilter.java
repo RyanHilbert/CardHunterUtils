@@ -1,3 +1,5 @@
+package utils;
+
 import java.util.EnumSet;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
