@@ -46,6 +46,9 @@ public class CardHunterUtils extends Application{
             scanner.nextLine();//parse remaining CSV file into items
             while(scanner.hasNextLine())Item.fromCSV(scanner.nextLine());
         }
+        
+        AssetLoader.setupJSON();        
+        
         ItemTable table=new ItemTable();//setup the user interface
         table.setPrefWidth(0);
         HBox.setHgrow(table,Priority.ALWAYS);
@@ -60,6 +63,9 @@ public class CardHunterUtils extends Application{
                 slot.setItem(item);
             }
         };
+        party.onSlotRightClick=slot -> {
+            new CardViewer(slot.itemProperty.getValue()).show(stage);
+        };
         
         partyFile=new File(partiesDir,"currentParty.bbcode");
         if(partyFile.isFile())
@@ -69,6 +75,8 @@ public class CardHunterUtils extends Application{
         stage.setScene(new Scene(new HBox(party,table),1000,750));
         
         stage.show();
+        
+        table.onShow();
     }
     
     @Override
@@ -76,6 +84,6 @@ public class CardHunterUtils extends Application{
         System.out.println("Stage is closing");
         
         if (party != null && partyFile != null)
-            party.SavePartyTo(partyFile);
+            party.savePartyTo(partyFile);
     }
 }

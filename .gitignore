@@ -1,6 +1,7 @@
 [aA]ssets/
 [sS]aved/
 *.class
+src/scripts/cardViewData.js
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -11,7 +12,7 @@
 *.ear
 
 # NetBeans #
-nbproject/private/private.*
+/nbproject/private/
 
 # Beyond Compare #
 *.orig

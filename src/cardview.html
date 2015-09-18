@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Card Viewer</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="styles/card_structure.css">
+        <link rel="stylesheet" type="text/css" href="styles/theme.css">
+        <script type="text/javascript" src="scripts/jquery.js"></script>
+        <script type="text/javascript" src="scripts/handlebars.js"></script>
+        <script type="text/javascript" src="scripts/initialize.js"></script>
+        <script type="text/javascript" src="../data/gameplay/Cards/cards.js"></script>
+        <script type="text/javascript" src="scripts/cardViewData.js"></script>
+        <script type="text/javascript">
+            var CARDS_PER_ROW = 6;
+            
+            function RenderSingleCard(renderFn) {
+                $("body").html(renderFn(window.cardViewData));
+                document.title = window.cardViewData.name || document.title;
+            }
+
+            function RenderCards(renderFn) {
+                if (window.cardViewData) {
+                    var cards = window.cardViewData.cards;
+                    var rows = Math.floor(((cards ? cards.length : 0) / CARDS_PER_ROW)) + 1;
+                    
+                    var compare = window.cardViewData.comparisons;
+                    if (compare) rows *=2;
+                    
+                    for(var ix = 0; ix < rows; ix++)
+                        $("body").append('<div id="row' + ix + '" class="flexbox"></div>');
+                    
+                    if (cards) {
+                        $.each(cards, function(ix, card) {
+                            var row = Math.floor(ix / CARDS_PER_ROW) * (compare ? 2 : 1);
+                            $("#row" + row).append(renderFn(window.cards[card]));
+                            
+                            if (compare) {
+                                var comparison = $("<div class='comparison'></div>")
+                                comparison.append(window.cards[card].implemented ?
+                                    '<img src="../assets/saved_card_art/' + card.replace(/ /g, "_") + '.jpeg" />' :
+                                    "<img src='images/NotYetImplemented.jpeg' />");
+                                $("#row" + ++row).append(comparison);
+                            }
+                        });
+                    
+                        
+                            
+                    }
+
+                    document.title = window.cardViewData.title || document.title;
+                }
+            }
+            
+            InitializeAnd(RenderCards);
+        </script>
+    </head>
+    <body>
+        <script id="cardTemplate" type="text/x-handlebars-template">
+            <div id="{{id}}" class="card {{quality}}">
+                <div class="title">{{name}}</div>
+                <div class="image" style="background: url('images/{{type1}}Background.png')">
+                    {{#if implemented}}
+                        {{#if artHeld}}
+                        <img src="images/ArtOnHold.png" />
+                        {{else}}
+                        <img src="../assets/card_illustrations/{{image.name}}{{image.ext}}" />
+                        <img class="set" src="images/{{set}}.png" />
+                        {{#if rarity}}<img class="rarity" src="images/{{rarity}}.png" />{{/if}}
+                        {{/if}}
+                    {{else}}
+                    <img src="images/NotYetImplemented.png" />
+                    {{/if}}
+                </div>
+                <div class="clearfix types">
+                    <div class="type1 left {{type1}}">&#160;</div>
+                    <div class="type2 right {{#if type2}}{{type2}}{{else}}{{type1}}{{/if}}">&#160;</div>
+                </div>
+                <div class="textboxes">
+                    {{#if attackType}}
+                        <div class="clearfix textbox midbar">
+                            <span class="left">{{attackType}} {{damageType}}</span>
+                            <span class="right">{{from}}</span>
+                        </div>
+                    {{/if}}
+                    {{#if hasAction}}
+                        <div class="textbox Action {{#if hasEffect1}}topHalf{{else}}fullHeight{{/if}}">
+                            {{> box action}}
+                        </div>
+                        {{#if hasEffect1}}
+                            <div class="textbox Trigger bottomHalf">
+                                {{> box triggers.[0]}}
+                            </div>
+                        {{/if}}
+                    {{else}}
+                        <div class="textbox Trigger {{#if ../hasEffect2}}topHalf{{else}}fullHeight{{/if}}">
+                            {{> box triggers.[0]}}
+                        </div>
+                        {{#if hasEffect2}}
+                            <div class="textbox Trigger bottomHalf">
+                                {{> box triggers.[1]}}
+                            </div>
+                        {{/if}}
+                    {{/if}}
+                </div>
+            </div>
+        </script>
+        <script id="boxTemplate" type="text/x-handlebars-template">
+            <span>{{{text}}}</span>
+            {{#each icons}}
+                {{#if type}}{{> icon .}}{{/if}}
+            {{/each}}
+        </script>
+        <script id="iconTemplate" type="text/x-handlebars-template">
+            <div class="{{side}} iconbox"><img src="images/{{iconImg type amount}}.png" /> <span class="iconText">{{{iconAmt type amount}}}</span></div>
+        </script>
+    </body>
+</html>

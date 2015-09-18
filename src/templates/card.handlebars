@@ -1,0 +1,37 @@
+<div class="card {{quality}}">
+    <div class="title">{{name}}</div>
+    <div class="image">
+        <img src="../assets/card_illustrations/{{image.name}}{{image.ext}}" />
+    </div>
+    <div class="clearfix types">
+        <div class="type1 left {{type1}}">&#160;</div>
+        <div class="type2 right {{#if type2}}{{type2}}{{else}}{{type1}}{{/if}}">&#160;</div>
+    </div>
+    <div class="textboxes">
+        {{#if attackType}}
+        <div class="clearfix textbox midbar">
+            <span class="left">{{attackType}} {{damageType}}</span>
+            <span class="right">{{from}}</span>
+        </div>
+        {{/if}}
+        {{#if hasAction}}
+            <div class="textbox Action {{#if hasEffect1}}topHalf{{else}}fullHeight{{/if}}">
+                {{> box action}}
+            </div>
+            {{#if hasEffect1}}
+                <div class="textbox Trigger bottomHalf">
+                    {{> box triggers.[0]}}
+                 </div>
+            {{/if}}
+        {{else}}
+            <div class="textbox Trigger {{#if ../hasEffect2}}topHalf{{else}}fullHeight{{/if}}">
+                {{> box triggers.[0]}}
+            </div>
+            {{#if hasEffect2}}
+                <div class="textbox Trigger bottomHalf">
+                    {{> box triggers.[1]}}
+                </div>
+            {{/if}}
+        {{/if}}
+    </div>
+</div>

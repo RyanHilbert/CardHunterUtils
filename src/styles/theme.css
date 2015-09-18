@@ -1,0 +1,20 @@
+.Black { background: #444; color: #FFF; } /* E */
+.Paper { background: url('../images/Paper.png') #AAA07D; color: #000; } /* D */
+.Bronze { background: url('../images/Bronze.png') #B50; color: #000; } /* C */
+.Silver { background: url('../images/Silver.png') #90ABB7; color: #000; } /* B */
+.Gold { background: url('../images/Gold.png') #C3A94B; color: #000; } /* A */
+.Emerald { background: url('../images/Emerald.png') #3A3; color: #000; } /* Emerald */
+.Amethyst { background: url('../images/Amethyst.png') purple; color: #000; } /* Amethyst */
+
+.Armor { background: slategrey; } /* Mail */
+.Assist { background: #AAB8C1; } /* Inspiration */
+.Attack { background: darkred; } /* Cut */
+.Block { background: #4B7A2C; } /* Parry */
+.Boost { background: #CF5514; } /* Slippery */
+.Handicap { background: #333; } /* Fumble */
+.Move { background: #1F3D57; } /* Run */
+.Utility { background: #654972; } /* Purge */
+
+.Action, .Action .iconbox { font-weight: bold; background: #DBD5C5; color: #000; text-align: justify; }
+.Trigger, .Trigger .iconbox { background: #393939; color: #FFF; text-align: justify; }
+.Trigger.textbox { padding: 4px; }
