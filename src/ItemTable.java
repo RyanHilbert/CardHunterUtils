@@ -20,6 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import models.CalculatedProperties;
 import javafx.stage.Stage;
 import ui.IPersistViewState;
 import models.Hoard;
@@ -36,8 +37,10 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
     private final static String SORT_DIRECTIONS = "sortDirections";
     
     private final List<TableColumn<Item, ?>> orderedColumns = new ArrayList<>();
+    private final List<TableColumn<Item, ?>> calculatedColumns = new ArrayList<>();
     private final List<EnumFilter> enumFilters = new ArrayList<>();
     private final List<TextField> textFilters = new ArrayList<>();
+    private final HashMap<CalculatedProperties.Names, TextField> calculatedFilters = new HashMap<>();
     
     public ItemTable(){
         final FilteredList<Item>filter=new FilteredList<>(Item.list,item->true);
@@ -53,9 +56,16 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         TableColumn<Item,HBox>cardCol=new TableColumn<>("Cards");
         TableColumn<Item,Item.Slot>slotCol=new TableColumn<>("Slot");
         TableColumn<Item,Set>setCol=new TableColumn<>("Set");
-        TableColumn<Item,Integer> qtyCol=new TableColumn<>("Qty");
-        TableColumn<Item,Integer> usedCol=new TableColumn<>("In Use");
-        TableColumn<Item,Integer> damageCol=new TableColumn<>("Damage");
+
+        for (CalculatedProperties.Names name : CalculatedProperties.Names.values()) {
+            TableColumn<Item, Integer> col = new TableColumn<>(name.toString());
+            col.setCellValueFactory(cell -> new ReadOnlyObjectWrapper(((Item) cell.getValue()).getCardProp(name)));
+            TextField textFilter = new TextField();
+            textFilter.setId(name + "Filter");
+            calculatedFilters.put(name, textFilter);
+            calculatedColumns.add(col);
+            col.setContextMenu(new ContextMenu(new CustomMenuItem(textFilter,false)));
+        }
         
         iconCol.setCellValueFactory(new PropertyValueFactory<>("view"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -65,9 +75,6 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         cardCol.setCellValueFactory(new PropertyValueFactory<>("cardView"));
         slotCol.setCellValueFactory(new PropertyValueFactory<>("slot"));
         setCol.setCellValueFactory(new PropertyValueFactory<>("set"));
-        qtyCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper(((Item) cell.getValue()).getQuantity()));
-        usedCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper(((Item) cell.getValue()).getNumInUse()));
-        damageCol.setCellValueFactory(new PropertyValueFactory<>("totalDamage"));
         
         EnumFilter<Rarity>rarityFilter=new EnumFilter<>(Rarity.class);
         EnumFilter<Item.Token.Pair>tokenFilter=new EnumFilter<>(Item.Token.Pair.class);
@@ -87,9 +94,7 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
             &&slotFilter.set.contains(item.slot)
             &&setFilter.set.contains(item.set)
             &&item.name.toLowerCase().contains(nameFilter.getText() != null ? nameFilter.getText().toLowerCase() : "")
-            &&Formula.eval(qtyFilter.getText(),item.getQuantity())
-            &&Formula.eval(usedFilter.getText(),item.getNumInUse())
-            &&Formula.eval(damageFilter.getText(),item.totalDamage));
+            &&evalCalculatedFilters(item));
         rarityFilter.set.addListener(listener);
         tokenFilter.set.addListener(listener);
         slotFilter.set.addListener(listener);
@@ -98,15 +103,14 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         qtyFilter.textProperty().addListener(listener);
         usedFilter.textProperty().addListener(listener);
         damageFilter.textProperty().addListener(listener);
+        for (TextField field : calculatedFilters.values())
+            field.textProperty().addListener(listener);
         
         nameCol.setContextMenu(new ContextMenu(new CustomMenuItem(nameFilter,false)));
         rarityCol.setContextMenu(new ContextMenu(new CustomMenuItem(rarityFilter,false)));
         tokenCol.setContextMenu(new ContextMenu(new CustomMenuItem(tokenFilter,false)));
         slotCol.setContextMenu(new ContextMenu(new CustomMenuItem(slotFilter,false)));
         setCol.setContextMenu(new ContextMenu(new CustomMenuItem(setFilter,false)));
-        qtyCol.setContextMenu(new ContextMenu(new CustomMenuItem(qtyFilter,false)));
-        usedCol.setContextMenu(new ContextMenu(new CustomMenuItem(usedFilter,false)));
-        damageCol.setContextMenu(new ContextMenu(new CustomMenuItem(damageFilter, false)));
         
         enumFilters.add(rarityFilter);
         enumFilters.add(tokenFilter);
@@ -122,17 +126,18 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         cardCol.setSortable(false);
         ObservableList<TableColumn<Item,?>>columns=getColumns();
 
-        orderedColumns.add(qtyCol);
+        // TODO: figure out a way to statically order the calculated prop columns
         orderedColumns.add(iconCol);
         orderedColumns.add(nameCol);
-        orderedColumns.add(usedCol);
         orderedColumns.add(rarityCol);
         orderedColumns.add(levelCol);
         orderedColumns.add(tokenCol);
         orderedColumns.add(cardCol);
         orderedColumns.add(slotCol);
         orderedColumns.add(setCol);
-        orderedColumns.add(damageCol);
+        
+        for (TableColumn<Item,?> c : calculatedColumns)
+            orderedColumns.add(c);
         
         for (TableColumn<Item,?> c : orderedColumns)
             columns.add(c);
@@ -154,6 +159,8 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
 
     @Override
     public void refresh(){
+        Item.CalculateStateDependentItemProps();
+        
         // lol, java... http://stackoverflow.com/questions/11065140/javafx-2-1-tableview-refresh-items
         TableColumn<Item,?> c=getColumns().get(0);
         boolean vis=c.isVisible();
@@ -187,6 +194,9 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
             f.updateViewState();
         
         for (TextField f : textFilters)
+            App.state().viewState.saveControlSetting(CONTROL_NAME, f.getId(), f.getText());
+        
+        for (TextField f : calculatedFilters.values())
             App.state().viewState.saveControlSetting(CONTROL_NAME, f.getId(), f.getText());
         // </editor-fold>
     }
@@ -236,6 +246,24 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         
         for (TextField f : textFilters)
             f.setText(App.state().viewState.getControlSetting(CONTROL_NAME, f.getId()));
+        
+        for (TextField f : calculatedFilters.values())
+            f.setText(App.state().viewState.getControlSetting(CONTROL_NAME, f.getId()));
         // </editor-fold>
+    }
+
+    private boolean evalCalculatedFilters(Item item) {
+        // TODO: write a multi-field eval so we don't spin up Formula.eval() in a loop
+        for (CalculatedProperties.Names name : calculatedFilters.keySet()) {
+            TextField field = calculatedFilters.get(name);
+            String filter = field.getText();
+            if (filter != null && !filter.isEmpty()) {
+                int val = item.getCardProp(name);
+                if (!Formula.eval(filter, val))
+                    return false;
+            }
+        }
+        
+        return true;
     }
 }
