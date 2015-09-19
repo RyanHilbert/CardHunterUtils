@@ -38,7 +38,7 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
     
     private final List<TableColumn<Item, ?>> orderedColumns = new ArrayList<>();
     private final List<TableColumn<Item, ?>> calculatedColumns = new ArrayList<>();
-    private final List<EnumFilter> enumFilters = new ArrayList<>();
+    private final HashMap<EnumFilter, TableColumn<Item, ?>> enumFilters = new HashMap<>();
     private final List<TextField> textFilters = new ArrayList<>();
     private final HashMap<CalculatedProperties.Names, TextField> calculatedFilters = new HashMap<>();
     
@@ -65,6 +65,15 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
             calculatedFilters.put(name, textFilter);
             calculatedColumns.add(col);
             col.setContextMenu(new ContextMenu(new CustomMenuItem(textFilter,false)));
+            
+            InvalidationListener listener=observable-> {
+                String f = textFilter.getText();
+                boolean isSet = (f != null && !filter.isEmpty());
+                
+                col.setStyle(isSet ? "-fx-background-color: #DFD; -fx-text-fill: green; -fx-font-weight: bold;" : "");
+            };
+            
+            textFilter.textProperty().addListener(listener);
         }
         
         iconCol.setCellValueFactory(new PropertyValueFactory<>("view"));
@@ -88,6 +97,15 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         usedFilter.setId("usedFilter");
         TextField damageFilter = new TextField();
         damageFilter.setId("damageFilter");
+        
+        InvalidationListener nameListener=observable-> {
+                String f = nameFilter.getText();
+                boolean isSet = (f != null && !f.isEmpty());
+                
+                nameCol.setStyle(isSet ? "-fx-background-color: #DFD; -fx-text-fill: green; -fx-font-weight: bold;" : "");
+            };
+        nameFilter.textProperty().addListener(nameListener);
+        
         InvalidationListener listener=observable->filter.setPredicate(item->
             rarityFilter.set.contains(item.rarity)
             &&tokenFilter.set.contains(Item.Token.Pair.get(item.token1,item.token2))
@@ -112,10 +130,20 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         slotCol.setContextMenu(new ContextMenu(new CustomMenuItem(slotFilter,false)));
         setCol.setContextMenu(new ContextMenu(new CustomMenuItem(setFilter,false)));
         
-        enumFilters.add(rarityFilter);
-        enumFilters.add(tokenFilter);
-        enumFilters.add(slotFilter);
-        enumFilters.add(setFilter);
+        enumFilters.put(rarityFilter, rarityCol);
+        enumFilters.put(tokenFilter, tokenCol);
+        enumFilters.put(slotFilter, tokenCol);
+        enumFilters.put(setFilter, setCol);
+        
+        enumFilters.keySet().stream().forEach((f) -> {
+            TableColumn<Item, ?> col = enumFilters.get(f);
+            
+            InvalidationListener enumListener=(observable)-> {
+                col.setStyle(f.isSet() ? "-fx-background-color: #DFD; -fx-text-fill: green; -fx-font-weight: bold;" : "");
+            };
+            
+            f.set.addListener(enumListener);
+        });
         
         textFilters.add(nameFilter);
         textFilters.add(qtyFilter);
@@ -190,7 +218,7 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         // </editor-fold>
         
         // <editor-fold defaultstate="collapsed" desc="filters">
-        for (EnumFilter f : enumFilters)
+        for (EnumFilter f : enumFilters.keySet())
             f.updateViewState();
         
         for (TextField f : textFilters)
@@ -241,7 +269,7 @@ public class ItemTable extends TableView<Item> implements IPersistViewState{
         // </editor-fold>
         
         // <editor-fold defaultstate="collapsed" desc="filters">
-        for (EnumFilter f : enumFilters)
+        for (EnumFilter f : enumFilters.keySet())
             f.setViewFromState();
         
         for (TextField f : textFilters)
