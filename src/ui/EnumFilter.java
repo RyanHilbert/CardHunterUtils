@@ -6,6 +6,8 @@ import java.util.EnumSet;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
@@ -42,8 +44,19 @@ public class EnumFilter<E extends Enum<E>>extends VBox implements IPersistViewSt
                 CheckBox box=(CheckBox) children.get(ix);
 
                 if (box != null) {
-                    box.setSelected(Boolean.parseBoolean(checks[ix]));
-                    box.getOnAction().handle(null);
+                    // remove handler temporarily
+                    EventHandler<ActionEvent> handler = box.getOnAction();
+                    box.setOnAction(null);
+                    
+                    boolean isSelected = box.isSelected();
+                    boolean shouldBeSelected = Boolean.parseBoolean(checks[ix]);
+                    if (shouldBeSelected != isSelected) {
+                        box.setSelected(shouldBeSelected);
+                    }
+                    
+                    box.setOnAction(handler);
+                    if (ix == checks.length - 1)
+                        box.getOnAction().handle(null); // fire handler to update column after setting last check
                 }
             }
         }
@@ -63,6 +76,21 @@ public class EnumFilter<E extends Enum<E>>extends VBox implements IPersistViewSt
         
         String checkState = String.join(",", checks);
         App.state().viewState.saveControlSetting(type.getName(), "filter", checkState);
+    }
+    
+    public boolean isUnset() {
+        return !isSet();
+    }
+    
+    public boolean isSet() {
+        for(Node n : getChildren()) {
+            CheckBox box=(CheckBox) n;
+            
+            if (box != null && !box.isSelected())
+                return true;
+        }
+        
+        return false;
     }
 
     @Override
