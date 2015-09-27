@@ -1,17 +1,15 @@
 package card.hunter;
 
-import card.hunter.io.Assets;
-import card.hunter.io.Data;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.CustomMenuItem;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import card.hunter.io.*;
+import java.util.*;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.scene.image.*;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.*;
 
 public final class Card extends Collectible<Card>{
     
@@ -145,12 +143,30 @@ public final class Card extends Collectible<Card>{
 	@Override public View getView() {
 		return new View();
 	}
-	public class View extends ImageView{//placeholder for actual thumbnail view class
-		private final ContextMenu menu=new ContextMenu(new CustomMenuItem(new FullView()));
+	public class View extends Group{
+		ContextMenu menu=new ContextMenu(new CustomMenuItem(new FullView()));
 		public View(){
-			super(thumbnail);
-			setFitWidth(62);
-			setFitHeight(37);
+			ObservableList<Node>children=getChildren();
+			children.add(new Rectangle(74,101,type1.color));
+			if(type2!=type1){
+				Rectangle secondary=new Rectangle(37,0,37,101);
+				secondary.setFill(type2.color);
+				children.add(secondary);
+			}
+			Label title=new Label(shortName);
+			title.setTextAlignment(TextAlignment.CENTER);
+			title.setFont(new Font(10));
+			title.setMinSize(74,16);
+			title.setMaxSize(74,16);
+			title.setBackground(new Background(new BackgroundFill(quality.color(),CornerRadii.EMPTY,Insets.EMPTY)));
+			children.add(title);
+			
+			ImageView view=new ImageView(thumbnail);
+			view.setFitWidth(62);
+			view.setFitHeight(37);
+			view.setX(6);
+			view.setY(22);
+			children.add(view);
 			setOnMouseClicked(event->menu.show(this,event.getScreenX(),event.getScreenY()));
 		}
 	}

@@ -57,20 +57,49 @@ public enum Assets{
 	public static final Image GREAT=retrieve("Great");
 	public static final Image ULTIMATE=retrieve("Ultimate");
 	
-	//public static final Image ARROW=retrieve("Arrow");
-	//public static final Image BOLT=retrieve("Bolt");
-	//public static final Image BOOT=retrieve("Boot");
-	//public static final Image PLATE=retrieve("Plate");
-	//public static final Image SHIELD=retrieve("Shield");
-	//public static final Image STAR=retrieve("Star");
-	//public static final Image SWORD=retrieve("Sword");
+	public static final Image BOLT=retrieve("Bolt");
+	public static final Image PLATE=retrieve("Plate");
+	public static final Image SHIELD=retrieve("Shield");
+	public static final Image STAR=retrieve("Star");
 	
 	//public static final Image ROLL1=retrieve("Roll1");
-	//public static final Image ROLL2=retrieve("Roll2");
-	//public static final Image ROLL3=retrieve("Roll3");
-	//public static final Image ROLL4=retrieve("Roll4");
-	//public static final Image ROLL5=retrieve("Roll5");
-	//public static final Image ROLL6=retrieve("Roll6");
+	public static final Image ROLL2=retrieve("Roll2");
+	public static final Image ROLL3=retrieve("Roll3");
+	public static final Image ROLL4=retrieve("Roll4");
+	public static final Image ROLL5=retrieve("Roll5");
+	public static final Image ROLL6=retrieve("Roll6");
+	
+	public static final Image Move0=retrieve("Move0");
+	public static final Image Move1=retrieve("Move1");
+	public static final Image Move2=retrieve("Move2");
+	public static final Image Move3=retrieve("Move3");
+	public static final Image Move4=retrieve("Move4");
+	public static final Image Move5=retrieve("Move5");
+	public static final Image Move6=retrieve("Move6");
+	public static final Image Move7=retrieve("Move7");
+	public static final Image Move8=retrieve("Move8");
+	
+	public static final Image DAMAGE0=retrieve("Damage0");
+	public static final Image DAMAGE1=retrieve("Damage1");
+	public static final Image DAMAGE2=retrieve("Damage2");
+	public static final Image DAMAGE3=retrieve("Damage3");
+	public static final Image DAMAGE4=retrieve("Damage4");
+	public static final Image DAMAGE5=retrieve("Damage5");
+	public static final Image DAMAGE6=retrieve("Damage6");
+	public static final Image DAMAGE7=retrieve("Damage7");
+	public static final Image DAMAGE8=retrieve("Damage8");
+	public static final Image DAMAGE9=retrieve("Damage9");
+	public static final Image DAMAGE10=retrieve("Damage10");
+	public static final Image DAMAGE11=retrieve("Damage11");
+	public static final Image DAMAGE12=retrieve("Damage12");
+	public static final Image DAMAGE13=retrieve("Damage13");
+	public static final Image DAMAGE14=retrieve("Damage14");
+	public static final Image DAMAGE15=retrieve("Damage15");
+	public static final Image DAMAGE16=retrieve("Damage16");
+	public static final Image DAMAGE17=retrieve("Damage17");
+	public static final Image DAMAGE18=retrieve("Damage18");
+	public static final Image DAMAGE19=retrieve("Damage19");
+	public static final Image DAMAGE20=retrieve("Damage20");
 	
 	private static Image retrieve(String name){
 		final Image result=new Image("card/icons/"+name+".png");
