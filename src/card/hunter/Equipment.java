@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 public final class Equipment extends Collectible<Equipment>{
@@ -72,6 +73,12 @@ public final class Equipment extends Collectible<Equipment>{
 		ArrayList<Card>list=new ArrayList<>(6);
 		for(int i=1;!(string=row.getString("Card "+i)).isEmpty();++i)list.add(map.get(string));
 		cards=Collections.unmodifiableList(Arrays.asList(this.array=list.toArray(new Card[0])));
+	}
+	public Node getView(){
+		ImageView view=new ImageView(illustration);
+		view.setFitWidth(60);
+		view.setFitHeight(60);
+		return view;
 	}
 	public List<Card>getCards(){
 		return cards;
