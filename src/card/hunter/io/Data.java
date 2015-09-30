@@ -157,11 +157,12 @@ public enum Data{
 			}
 			public byte getByte(String string){
 				string=getString(string);
-				return string.isEmpty()||string.charAt(0)=='D'?0:Byte.parseByte(string);//'D' hack for weird Lightning Breath trigger roll value
+				if(string.isEmpty()||string.charAt(0)=='D')return-1;//'D' hack needed for strange trigger value of Lightning Breath card
+				byte result=Byte.parseByte(string);
+				return result<0?(byte)-result:result;
 			}
 			public int getInt(String string){//throws NullPointerException if not found or NumberFormatException if cannot be read as int
-				string=getString(string);
-				return string.isEmpty()?0:Integer.parseInt(string);
+				return Integer.parseInt(getString(string));
 			}
 			public String getString(String string){//same as get(), but throws NullPointerException instead of returning null
 				return row[columnMap.get(string)];

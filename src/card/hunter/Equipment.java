@@ -87,6 +87,7 @@ public final class Equipment extends Collectible<Equipment>{
 	}
 	public Node getCardView(){
 		HBox result=new HBox();
+		result.setSpacing(2);
 		for(Card card:array)result.getChildren().add(card.getView());
 		return result;
 	}

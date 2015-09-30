@@ -1,15 +1,15 @@
 package card.hunter;
 
 public enum Race{
-	Dwarf(Slot.Dwarf_Skill,366),
-	Human(Slot.Human_Skill,356),
-	Elf(Slot.Elf_Skill,349);
+	Dwarf(366),
+	Human(356),
+	Elf(349);
 	
 	public final Slot slot;
 	private final int id;
 	
-	Race(Slot slot,int id){
-		this.slot=slot;
+	Race(int id){
+		this.slot=Slot.valueOf(name()+"_Skill");
 		this.id=id;
 	}
 	public Slot getSlot(){

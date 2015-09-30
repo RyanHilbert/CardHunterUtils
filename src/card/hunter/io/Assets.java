@@ -57,6 +57,9 @@ public enum Assets{
 	public static final Image GREAT=retrieve("Great");
 	public static final Image ULTIMATE=retrieve("Ultimate");
 	
+	public static final Image PLAY=retrieve("Play");
+	public static final Image TRIGGER=retrieve("Trigger");
+	
 	public static final Image BOLT=retrieve("Bolt");
 	public static final Image PLATE=retrieve("Plate");
 	public static final Image SHIELD=retrieve("Shield");
@@ -78,6 +81,17 @@ public enum Assets{
 	public static final Image Move6=retrieve("Move6");
 	public static final Image Move7=retrieve("Move7");
 	public static final Image Move8=retrieve("Move8");
+	
+	public static final Image Range1=retrieve("Range1");
+	public static final Image Range2=retrieve("Range2");
+	public static final Image Range3=retrieve("Range3");
+	public static final Image Range4=retrieve("Range4");
+	public static final Image Range5=retrieve("Range5");
+	public static final Image Range6=retrieve("Range6");
+	public static final Image Range7=retrieve("Range7");
+	public static final Image Range8=retrieve("Range8");
+	public static final Image Range9=retrieve("Range9");
+	public static final Image Range10=retrieve("Range10");
 	
 	public static final Image DAMAGE0=retrieve("Damage0");
 	public static final Image DAMAGE1=retrieve("Damage1");
