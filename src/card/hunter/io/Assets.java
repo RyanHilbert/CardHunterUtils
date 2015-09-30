@@ -60,12 +60,14 @@ public enum Assets{
 	public static final Image PLAY=retrieve("Play");
 	public static final Image TRIGGER=retrieve("Trigger");
 	
+	public static final Image ARROW=retrieve("Arrow");
+	public static final Image BOOT=retrieve("Boot");
+	public static final Image SWORD=retrieve("Sword");
 	public static final Image BOLT=retrieve("Bolt");
 	public static final Image PLATE=retrieve("Plate");
 	public static final Image SHIELD=retrieve("Shield");
 	public static final Image STAR=retrieve("Star");
 	
-	//public static final Image ROLL1=retrieve("Roll1");
 	public static final Image ROLL2=retrieve("Roll2");
 	public static final Image ROLL3=retrieve("Roll3");
 	public static final Image ROLL4=retrieve("Roll4");
