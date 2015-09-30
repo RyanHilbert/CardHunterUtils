@@ -62,9 +62,6 @@ public abstract class Collectible<C extends Collectible<C>>implements Comparable
 	@Override public int compareTo(Collectible c){
 		return id-c.id;
 	}
-	@Override public Node getView(){
-		return new ImageView(illustration);
-	}
 	public int getId(){
 		return id;
 	}

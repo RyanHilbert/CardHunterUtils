@@ -149,7 +149,7 @@ public final class Card extends Collectible<Card>{
 	public Image getThumbnail(){
 		return thumbnail;
 	}
-	@Override public View getView() {
+	@Override public Node getView() {
 		return new View();
 	}
 	public class FullView extends ImageView{//placeholder for actual fullsize view class
@@ -239,6 +239,7 @@ public final class Card extends Collectible<Card>{
 					view=new ImageView(Assets.STAR);
 					view.setLayoutX(x2);
 					view.setLayoutY(y2);
+					children.add(view);
 				}
 			}
 			if(!row2){
