@@ -3,19 +3,14 @@ package card.hunter;
 import javafx.scene.layout.VBox;
 
 public enum Token implements ViewableEnum<Token>{
-	Base,Minor,Major,Great,Ultimate;
+	None,Minor,Major,Great,Ultimate;
 	
-	private static final Token[]values=values();
-	
-	public static Token valueOf(int i){
-		return i==-1?Base:values[i];
-	}
 	public Pair pair(Token token){
 		return Pair.valueOf(this,token);
 	}
 	public enum Pair implements Viewable{
 
-		Base_Base,Minor_Base,Minor_Minor,Major_Base,Major_Minor,Major_Major;
+		None_None,Minor_None,Minor_Minor,Major_None,Major_Minor,Major_Major;
 
 		public final Token greater,lesser;
 

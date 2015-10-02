@@ -1,5 +1,6 @@
 package card.hunter;
 
+import card.hunter.collectible.Equipment;
 import java.util.ArrayList;
 import java.util.Iterator;
 

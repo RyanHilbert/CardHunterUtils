@@ -10,7 +10,7 @@ import models.Item;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 
-import card.hunter.Equipment;
+import card.hunter.collectible.Equipment;
 import card.hunter.Rarity;
 import card.hunter.Set;
 import card.hunter.Slot;

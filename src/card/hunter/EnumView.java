@@ -1,12 +1,16 @@
 package card.hunter;
 
 import card.hunter.io.Assets;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.*;
 
 public class EnumView<E extends Enum<E>&ViewableEnum<E>>extends ImageView implements Comparable<EnumView<E>>{
 	public final E viewed;
 	public EnumView(E e){
 		super(Assets.get(e.name()));
+		viewed=e;
+	}
+	public EnumView(E e,Image image){
+		super(image);
 		viewed=e;
 	}
 	@Override public boolean equals(Object object){

@@ -83,12 +83,12 @@ public enum Data{
 		@Override public int size(){
 			return data.length;
 		}
-		public Table(){
+		Table(){
 			columnArray=null;
 			data=null;
 			columns=null;
 		}
-		public Table(File file){//not meant for files >2gb or that don't fit into JVM memory
+		Table(File file){//not meant for files >2gb or that don't fit into JVM memory
 			try(final LineNumberReader reader=new LineNumberReader(new FileReader(file))){
 				reader.readLine();//skip the first line
 				columnArray=reader.readLine().split(",");
@@ -134,16 +134,18 @@ public enum Data{
 			public Table getTable(){
 				return Table.this;
 			}
-			public<E extends Enum<E>>E getEnum(Class<E>e){
-				return getEnum(e,e.getSimpleName().replace('_',' '));
+			public<E extends Enum<E>>E getEnum(E e){
+				return getEnum(e,e.getDeclaringClass().getSimpleName().replace('_',' '));
 			}
-			public<E extends Enum<E>>E getEnum(Class<E>e,String string){//throws NPE if not found or IllegalArgumentException if cannot be read as E
+			public<E extends Enum<E>>E getEnum(E e,String string){//throws NPE if not found or IllegalArgumentException if cannot be read as E
 				string=getString(string);
+				if(string.isEmpty())return e;
 				try{
-					final int i=string.isEmpty()?0:Integer.parseInt(string);
-					return e.getEnumConstants()[i==-1?0:i];
+					final int index=Integer.parseInt(string);
+					if(index<0)return e;
+					return e.getDeclaringClass().getEnumConstants()[index];
 				}catch(NumberFormatException ex){
-					return Enum.valueOf(e,string.replace(' ','_'));
+					return Enum.valueOf(e.getDeclaringClass(),string.replace(' ','_'));
 				}
 			}
 			public<E extends Enum<E>>EnumSet<E>getEnums(Class<E>e){

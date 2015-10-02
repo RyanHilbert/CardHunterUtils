@@ -1,5 +1,7 @@
 package card.hunter;
 
+import card.hunter.collectible.Card;
+
 public enum Race{
 	Dwarf(366),
 	Human(356),

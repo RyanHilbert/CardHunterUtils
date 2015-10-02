@@ -1,13 +1,10 @@
 package card.hunter.fx;
 
-import card.hunter.Card;
-import card.hunter.Equipment;
-import card.hunter.io.Data;
+import card.hunter.collectible.Equipment;
 import java.io.File;
 import java.nio.file.Paths;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
