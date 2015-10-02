@@ -2,7 +2,7 @@ package card.hunter;
 
 import javafx.scene.paint.Color;
 
-public enum Card_Type{
+public enum Type{
 	Armor(Color.GRAY),
 	Assist(Color.LIGHTGRAY),
 	Attack(Color.DARKRED),
@@ -14,7 +14,7 @@ public enum Card_Type{
 	
 	public final Color color;
 	
-	Card_Type(Color color){
+	Type(Color color){
 		this.color=color;
 	}
 }

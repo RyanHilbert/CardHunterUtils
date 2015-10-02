@@ -41,16 +41,15 @@ public enum Assets{
 	public final File directory;
 	public final String extension;
 	
-	public static final Image BASE=retrieve("Base");
-	//public static final Image AOTA=retrieve("AotA");
-	//public static final Image CIT=retrieve("Cit");
-	//public static final Image AA=retrieve("AA");
+	public static final Image NULL=retrieve(null);//1x1 transparent null.png
+	
+	public static final Image AOTA=retrieve("AotA");
+	public static final Image CIT=retrieve("Cit");
+	public static final Image AA=retrieve("AA");//needs actual image
 	
 	public static final Image COMMON=retrieve("Common");
 	public static final Image UNCOMMON=retrieve("Uncommon");
 	public static final Image RARE=retrieve("Rare");
-	//public static final Image EPIC=retrieve("Epic");
-	//public static final Image LEGENDARY=retrieve("Legendary");
 	
 	public static final Image MINOR=retrieve("Minor");
 	public static final Image MAJOR=retrieve("Major");
@@ -74,26 +73,26 @@ public enum Assets{
 	public static final Image ROLL5=retrieve("Roll5");
 	public static final Image ROLL6=retrieve("Roll6");
 	
-	public static final Image Move0=retrieve("Move0");
-	public static final Image Move1=retrieve("Move1");
-	public static final Image Move2=retrieve("Move2");
-	public static final Image Move3=retrieve("Move3");
-	public static final Image Move4=retrieve("Move4");
-	public static final Image Move5=retrieve("Move5");
-	public static final Image Move6=retrieve("Move6");
-	public static final Image Move7=retrieve("Move7");
-	public static final Image Move8=retrieve("Move8");
+	public static final Image MOVE0=retrieve("Move0");
+	public static final Image MOVE1=retrieve("Move1");
+	public static final Image MOVE2=retrieve("Move2");
+	public static final Image MOVE3=retrieve("Move3");
+	public static final Image MOVE4=retrieve("Move4");
+	public static final Image MOVE5=retrieve("Move5");
+	public static final Image MOVE6=retrieve("Move6");
+	public static final Image MOVE7=retrieve("Move7");
+	public static final Image MOVE8=retrieve("Move8");
 	
-	public static final Image Range1=retrieve("Range1");
-	public static final Image Range2=retrieve("Range2");
-	public static final Image Range3=retrieve("Range3");
-	public static final Image Range4=retrieve("Range4");
-	public static final Image Range5=retrieve("Range5");
-	public static final Image Range6=retrieve("Range6");
-	public static final Image Range7=retrieve("Range7");
-	public static final Image Range8=retrieve("Range8");
-	public static final Image Range9=retrieve("Range9");
-	public static final Image Range10=retrieve("Range10");
+	public static final Image RANGE1=retrieve("Range1");
+	public static final Image RANGE2=retrieve("Range2");
+	public static final Image RANGE3=retrieve("Range3");
+	public static final Image RANGE4=retrieve("Range4");
+	public static final Image RANGE5=retrieve("Range5");
+	public static final Image RANGE6=retrieve("Range6");
+	public static final Image RANGE7=retrieve("Range7");
+	public static final Image RANGE8=retrieve("Range8");
+	public static final Image RANGE9=retrieve("Range9");
+	public static final Image RANGE10=retrieve("Range10");
 	
 	public static final Image DAMAGE0=retrieve("Damage0");
 	public static final Image DAMAGE1=retrieve("Damage1");
@@ -123,7 +122,7 @@ public enum Assets{
 		return result;
 	}
 	public static Image get(String name){
-		return jarAssets.get(name);
+		return jarAssets.getOrDefault(name,NULL);
 	}
 	Assets(final String ext){
 		extension=ext;

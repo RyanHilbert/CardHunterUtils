@@ -1,6 +1,6 @@
 package card.hunter.fx;
 
-import card.hunter.Equipment;
+import card.hunter.collectible.Equipment;
 import card.hunter.Rarity;
 import card.hunter.Set;
 import card.hunter.Slot;
