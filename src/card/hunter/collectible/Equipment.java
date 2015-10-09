@@ -1,5 +1,9 @@
 package card.hunter.collectible;
 
+import app.App;
+import card.hunter.CalculatedProperties;
+import card.hunter.Hoard;
+import card.hunter.Party;
 import card.hunter.Rarity;
 import card.hunter.Set;
 import card.hunter.Slot;
@@ -7,6 +11,7 @@ import card.hunter.Token;
 import card.hunter.io.Assets;
 import card.hunter.io.Data;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,6 +38,9 @@ public final class Equipment extends Collectible{
 
 	/** The {@link Slot} this Equipment belongs to. */
 	public final Slot slot;
+        
+        /** The icon for this Equipment */
+        public final Image icon=this.illustration;
 
 	private static final List<Equipment> cache=new ArrayList<>();
 	private static final Map<Integer,Equipment> idCache=new HashMap<>();
@@ -70,13 +78,30 @@ public final class Equipment extends Collectible{
 			return nameMap;
 		}
 	}
+	
+	private final HashMap<CalculatedProperties.Names, Integer> cardProps = new HashMap<>();
+	
+    public final int getCardProp(CalculatedProperties.Names name) { 
+        return cardProps.get(name); 
+    }
+	
+    public int getQuantity(){
+        return Hoard.countOf(this);
+    }
+
+    public int getNumInUse(){
+        return Party.count(this);
+    }
+	
 	public Equipment(int id,String name,String shortName,Rarity rarity,Set set,byte level,Image icon,Slot slot,Token token1,Token token2,Card... cards){
 		super(id,name,shortName,rarity,set,level,icon);
 		this.slot=slot;
 		this.token1=token1;
 		this.token2=token2;
+        this.calculateCardProps();
 		this.cards=Collections.unmodifiableList(Arrays.asList(cards));
 	}
+
 	Equipment(Data.Table.Row row,Map<String,Card> map){
 		super(row);
 		slot=row.getEnum(Slot.Treasure);
@@ -88,6 +113,7 @@ public final class Equipment extends Collectible{
 
 		ArrayList<Card> list=new ArrayList<>(6);
 		for(int i=1;!(string=row.getString("Card "+i)).isEmpty();++i)list.add(map.get(string));
+        this.calculateCardProps();
 		cards=Collections.unmodifiableList(list);
 	}
 	public List<Card> getCards(){
@@ -115,4 +141,111 @@ public final class Equipment extends Collectible{
 		in.defaultReadObject();
 		illustration=Assets.item_illustrations.load(name);
 	}
+	
+    private void calculateCardProps() {
+        for (CalculatedProperties.Names prop : CalculatedProperties.Names.values())
+            if (prop.isCardDriven())
+                cardProps.put(prop, CalculatedProperties.calc(prop, this));
+    }
+    
+    // TODO: Get this to be observable instead of public static :/
+    // Basically, fix the initialization timing so that this happens on Party/Hoard load
+    public static void CalculateStateDependentItemProps() {
+        for (Equipment item : list)
+            for (CalculatedProperties.Names prop : CalculatedProperties.Names.values())
+                if (prop.isStateDriven())
+                    item.cardProps.put(prop, CalculatedProperties.calc(prop, item));
+    }
+    
+    //passes CSV data into the Item constructor
+//    public static Equipment fromCSV(String string){
+//        String[]s=CSV.tokenizeLine(string);
+//        byte token2=0;//must handle empty string and -1
+//        try{token2=Byte.parseByte(0+s[8]);}
+//        catch(NumberFormatException e){}
+//        return new Equipment(Integer.parseInt(s[0],10),s[1],
+//                Rarity.valueOf(s[3]),
+//                Byte.parseByte(s[4]),
+//                Token.value(Byte.parseByte(0+s[7])),
+//                Token.value(token2),
+//                Card.map.get(s[9]),
+//                Card.map.get(s[10]),
+//                Card.map.get(s[11]),
+//                Card.map.get(s[12]),
+//                Card.map.get(s[13]),
+//                Card.map.get(s[14]),
+//                Slot.valueOf(s[19].replace(' ','_')),
+//                s[21],
+//                Set.value(Byte.parseByte(0+s[23]))
+//        );
+//    }
+
+    public static Equipment byName(String name){
+        for(Equipment i : list){
+            if(i.name.equalsIgnoreCase(name)){
+                return i;
+            }
+        }
+
+        return null;
+    }
+    
+    public static ArrayList<Equipment> byName(String... names){
+        ArrayList<Equipment> retVal = new ArrayList<>(names.length);
+        
+        for(String n : names)
+            retVal.add(Equipment.byName(n));
+
+        return retVal;
+    }
+    
+    public static Equipment byId(int id){
+        for(Equipment i : list){
+            if(i.id == id){
+                return i;
+            }
+        }
+
+        return null;
+    }
+    
+    public static ArrayList<Equipment> byName(int... ids){
+        ArrayList<Equipment> retVal = new ArrayList<>(ids.length);
+        
+        for(int n : ids)
+            retVal.add(Equipment.byId(n));
+
+        return retVal;
+    }
+
+    public static Comparator<Equipment> nameComparer=(a,b) -> {
+        return a.name.compareTo(b.name);
+    };
+
+    
+    public String toCardViewJson() {
+        return this.toCardViewJson(App.state().compareCardArt);
+    }
+
+    public String toCardViewJson(boolean comparisons) {
+        String format = 
+            "cardViewData = {\n" +
+            "title: \"%s\", \n" +
+            "cards: [\"%s\"], \n" +
+            "comparisons: %s };";
+        
+        String json = String.format(format, 
+            this.name,
+            this.getCardsString(),
+            comparisons
+        );
+        
+        return json;
+    }
+    
+    public String getCardsString() {
+        return cards.toString();
+    }
+	
+    @Override public String toString(){return name;}
 }

@@ -1,24 +1,25 @@
-package models;
+package card.hunter;
 
+import card.hunter.collectible.Equipment;
 import java.util.Comparator;
 import java.util.TreeMap;
 
 // Class for holding a hoard of Card Hunter items
-public class Hoard extends TreeMap<Item,Integer>{
+public class Hoard extends TreeMap<Equipment,Integer>{
     // <editor-fold defaultstate="collapsed" desc="Singleton implementation">
     private static Hoard instance = null;
 
     private static Hoard get() {
         if(instance==null)
-            instance=new Hoard(Item.nameComparer);
+            instance=new Hoard(Equipment.nameComparer);
 
         return instance;
     }
 
-    private Hoard(Comparator<Item> c) { super(c); };
+    private Hoard(Comparator<Equipment> c) { super(c); };
     // </editor-fold>
 
-    public static int countOf(Item item) {
+    public static int countOf(Equipment item) {
         Hoard h = get();
         return (item != null && h.containsKey(item)) ? 
             h.get(item) : 0;
@@ -58,7 +59,7 @@ public class Hoard extends TreeMap<Item,Integer>{
                     break;
                 else {
                     int id = Integer.parseInt(line.substring(LINE_INDEX), 10);
-                    Item item = Item.byId(id);
+                    Equipment item = Equipment.byId(id);
                     ix++;
                     if (item == null)
                         System.out.format("\tUh-oh, couldn't find an item with id %d.  Maybe we don't have the latest item data update?\n", id);
@@ -102,7 +103,7 @@ public class Hoard extends TreeMap<Item,Integer>{
                 String fields[]=line.split("\t");
 
                 int id=Integer.parseInt(fields[ID],10);
-                Item item=Item.byId(id);
+                Equipment item=Equipment.byId(id);
 
                 if(item==null){
                     System.out.format("\tUh-oh, couldn't find an item with id %d.  Maybe we don't have the latest item data update?\n",id);
@@ -128,7 +129,7 @@ public class Hoard extends TreeMap<Item,Integer>{
         int cash=0;
 
         if(h.size()>0){
-            for(Item item : h.keySet()){
+            for(Equipment item : h.keySet()){
                 int qty=h.get(item);
                 int saleVal=(Rarity.saleValue(item.rarity)*qty);
                 sum+=qty;
@@ -164,7 +165,7 @@ public class Hoard extends TreeMap<Item,Integer>{
                 lineLead+=" ";
             }
 
-            for(Item item : h.keySet()){
+            for(Equipment item : h.keySet()){
                 hoardText+=lineLead+item.id+"\n";
                 hoardText+=lineLead+h.get(item)+"\n";
             }

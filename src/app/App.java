@@ -2,9 +2,10 @@ package app;
 
 // Class for holding static settings / state for a running app instance
 
+import card.hunter.fx.IPersistViewState;
+import card.hunter.fx.ViewState;
 import java.util.ArrayList;
-import ui.IPersistViewState;
-import ui.ViewState;
+
 
 public class App {
   // <editor-fold defaultstate="collapsed" desc="Singleton implementation">

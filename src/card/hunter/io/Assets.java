@@ -167,9 +167,9 @@ public enum Assets{
 		}
 		image.progressProperty().addListener(new ChangeListener<Number>(){
 			@Override public void changed(ObservableValue<?extends Number>observable,Number oldValue,Number newValue){
-				if(newValue.doubleValue()>=1.0){//when image is finished downloading...
+				if(newValue.doubleValue()>=1.0 && (Image)image != null){//when image is finished downloading...
 					try{//attempt to save it to disk
-						directory.mkdirs();
+                                                directory.mkdirs();
 						ImageIO.write(SwingFXUtils.fromFXImage(image,null),extension,file);
 					}catch(IllegalArgumentException e){
 						throw new IllegalArgumentException(name,e);

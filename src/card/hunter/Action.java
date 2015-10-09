@@ -1,10 +1,10 @@
-package models;
+package card.hunter;
 
 public class Action {
     public final String text,flavorText,fullText,iconLeft,iconRight;
     public final byte amountLeft,amountRight;
     
-    public Action(Card.Type type,String text, String flavorText, byte damage, byte range, byte movement){
+    public Action(Type type,String text, String flavorText, byte damage, byte range, byte movement){
         this.text=text.trim();
         this.flavorText=flavorText.trim();
         this.fullText=this.text + (this.text.length() > 0 ? "<br /><br />" : "") + "<i>" + this.flavorText + "</i>";

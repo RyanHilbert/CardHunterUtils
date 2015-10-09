@@ -1,4 +1,4 @@
-package ui;
+package card.hunter.fx;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.ButtonBar.ButtonData;

@@ -1,22 +1,24 @@
 import app.App;
-import models.Card;
-import models.Item;
+import card.hunter.Hoard;
+import card.hunter.collectible.Card;
+import card.hunter.collectible.Equipment;
+import card.hunter.fx.CardViewer;
+import card.hunter.fx.ItemTable;
+import card.hunter.fx.PartyView;
+import card.hunter.fx.ViewState;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Scanner;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
-import models.Hoard;
-import ui.CardViewer;
 import utils.AssetLoader;
-import ui.ViewState;
 import utils.FileUtils;
 
 public class CardHunterUtils extends Application{
@@ -50,16 +52,19 @@ public class CardHunterUtils extends Application{
         if(!itemFile.isFile())try(InputStream in=new URL(address+itemFile.toString().replace('\\','/')).openStream()){
             Files.copy(in,itemFile.toPath());//download item file if not found
         }
-        try(Scanner scanner=new Scanner(cardFile,StandardCharsets.ISO_8859_1.toString())){
-            scanner.nextLine();//skip first two lines
-            scanner.nextLine();//parse remaining CSV file into cards
-            while(scanner.hasNextLine())Card.fromCSV(scanner.nextLine());
-        }
-        try(Scanner scanner=new Scanner(itemFile,StandardCharsets.ISO_8859_1.toString())){
-            scanner.nextLine();//skip first two lines
-            scanner.nextLine();//parse remaining CSV file into items
-            while(scanner.hasNextLine())Item.fromCSV(scanner.nextLine());
-        }
+//        try(Scanner scanner=new Scanner(cardFile,StandardCharsets.ISO_8859_1.toString())){
+//            scanner.nextLine();//skip first two lines
+//            scanner.nextLine();//parse remaining CSV file into cards
+//            while(scanner.hasNextLine())Card.fromCSV(scanner.nextLine());
+//        }
+//        try(Scanner scanner=new Scanner(itemFile,StandardCharsets.ISO_8859_1.toString())){
+//            scanner.nextLine();//skip first two lines
+//            scanner.nextLine();//parse remaining CSV file into items
+//            while(scanner.hasNextLine())Equipment.fromCSV(scanner.nextLine());
+//        }
+                
+        ObservableList<Card> allCards = FXCollections.observableList(Card.list());
+        ObservableList<Equipment> allEquipment = FXCollections.observableList(Equipment.list());
         
         AssetLoader.setupJSON();        
         
@@ -72,7 +77,7 @@ public class CardHunterUtils extends Application{
             Hoard.load(FileUtils.textFromFile(hoardFile));
         }
 
-        ItemTable table=new ItemTable();//setup the user interface
+        ItemTable table=new ItemTable(allEquipment);//setup the user interface
         table.setPrefWidth(0);
         HBox.setHgrow(table,Priority.ALWAYS);
         
@@ -80,7 +85,7 @@ public class CardHunterUtils extends Application{
         
         party=new PartyView();
         party.onSlotClick=slot -> {
-            Item item=table.getFocusModel().getFocusedItem();
+            Equipment item=table.getFocusModel().getFocusedItem();
             if(slot.isHolding(item)){
                 slot.empty();
             }

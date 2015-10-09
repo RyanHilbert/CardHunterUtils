@@ -1,4 +1,4 @@
-package ui;
+package card.hunter.fx;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

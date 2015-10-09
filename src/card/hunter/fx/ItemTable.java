@@ -1,20 +1,16 @@
 package card.hunter.fx;
-import app.App;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import ui.EnumFilter;
-import models.Rarity;
-import models.Set;
-import models.Item;
-import javafx.beans.InvalidationListener;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 
+import app.App;
 import card.hunter.collectible.Equipment;
+import card.hunter.CalculatedProperties;
 import card.hunter.Rarity;
 import card.hunter.Set;
 import card.hunter.Slot;
 import card.hunter.Token;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -28,12 +24,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import models.CalculatedProperties;
 import javafx.stage.Stage;
-import ui.IPersistViewState;
-import models.Hoard;
-import ui.CardViewer;
-import ui.MouseHelper;
 import utils.Formula;
 
 public class ItemTable extends TableView<Equipment> implements IPersistViewState{
@@ -44,9 +35,9 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
     private final static String SORTED_COLUMNS = "sortedColumns";
     private final static String SORT_DIRECTIONS = "sortDirections";
     
-    private final List<TableColumn<Item, ?>> orderedColumns = new ArrayList<>();
-    private final List<TableColumn<Item, ?>> calculatedColumns = new ArrayList<>();
-    private final HashMap<EnumFilter, TableColumn<Item, ?>> enumFilters = new HashMap<>();
+    private final List<TableColumn<Equipment, ?>> orderedColumns = new ArrayList<>();
+    private final List<TableColumn<Equipment, ?>> calculatedColumns = new ArrayList<>();
+    private final HashMap<EnumFilter, TableColumn<Equipment, ?>> enumFilters = new HashMap<>();
     private final List<TextField> textFilters = new ArrayList<>();
     private final HashMap<CalculatedProperties.Names, TextField> calculatedFilters = new HashMap<>();
     
@@ -66,8 +57,8 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
         TableColumn<Equipment,Set>setCol=new TableColumn<>("Set");
 
         for (CalculatedProperties.Names name : CalculatedProperties.Names.values()) {
-            TableColumn<Item, Integer> col = new TableColumn<>(name.toString());
-            col.setCellValueFactory(cell -> new ReadOnlyObjectWrapper(((Item) cell.getValue()).getCardProp(name)));
+            TableColumn<Equipment, Integer> col = new TableColumn<>(name.toString());
+            col.setCellValueFactory(cell -> new ReadOnlyObjectWrapper(((Equipment) cell.getValue()).getCardProp(name)));
             TextField textFilter = new TextField();
             textFilter.setId(name + "Filter");
             calculatedFilters.put(name, textFilter);
@@ -144,7 +135,7 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
         enumFilters.put(setFilter, setCol);
         
         enumFilters.keySet().stream().forEach((f) -> {
-            TableColumn<Item, ?> col = enumFilters.get(f);
+            TableColumn<Equipment, ?> col = enumFilters.get(f);
             
             InvalidationListener enumListener=(observable)-> {
                 col.setStyle(f.isSet() ? "-fx-background-color: #DFD; -fx-text-fill: green; -fx-font-weight: bold;" : "");
@@ -172,10 +163,10 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
         orderedColumns.add(slotCol);
         orderedColumns.add(setCol);
         
-        for (TableColumn<Item,?> c : calculatedColumns)
+        for (TableColumn<Equipment,?> c : calculatedColumns)
             orderedColumns.add(c);
         
-        for (TableColumn<Item,?> c : orderedColumns)
+        for (TableColumn<Equipment,?> c : orderedColumns)
             columns.add(c);
 			
         setOnMouseClicked(event->{
@@ -195,10 +186,10 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
 
     @Override
     public void refresh(){
-        Item.CalculateStateDependentItemProps();
+        Equipment.CalculateStateDependentItemProps();
         
         // lol, java... http://stackoverflow.com/questions/11065140/javafx-2-1-tableview-refresh-items
-        TableColumn<Item,?> c=getColumns().get(0);
+        TableColumn<Equipment,?> c=getColumns().get(0);
         boolean vis=c.isVisible();
         c.setVisible(!vis);
         c.setVisible(vis);
@@ -207,7 +198,7 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
     @Override
     public void updateViewState() {
         // <editor-fold defaultstate="collapsed" desc="column order and sort">
-        ObservableList<TableColumn<Item, ?>> columns = getColumns();
+        ObservableList<TableColumn<Equipment, ?>> columns = getColumns();
         String[] colOrder = new String[columns.size()];
         ArrayList<String> sortCols = new ArrayList<>();
         ArrayList<String> sortDirs = new ArrayList<>();
@@ -216,7 +207,7 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
           colOrder[i] = orderedColumns.indexOf(columns.get(i)) + "";
         }
         
-        for (TableColumn<Item, ?> c : getSortOrder()) {
+        for (TableColumn<Equipment, ?> c : getSortOrder()) {
             sortCols.add(c.getText());
             sortDirs.add(c.getSortType().toString());
         }
@@ -241,7 +232,7 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
     public void setViewFromState() {
         // <editor-fold defaultstate="collapsed" desc="column order">
         HashMap<String, String> settings = App.state().viewState.getControlSettings(CONTROL_NAME);
-        ObservableList<TableColumn<Item, ?>> columns = getColumns();
+        ObservableList<TableColumn<Equipment, ?>> columns = getColumns();
         
         String orderText = settings.get(COL_ORDER);
         if (orderText != null && !orderText.isEmpty()) {
@@ -261,11 +252,11 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
             String[] sortCols = sortText.split(",");
             String[] sortDirs = settings.get(SORT_DIRECTIONS).split(",");
 
-            List<TableColumn<Item, ?>> sortOrder = getSortOrder();
+            List<TableColumn<Equipment, ?>> sortOrder = getSortOrder();
             sortOrder.clear();
 
             for (int ix = 0; ix < sortCols.length; ix++) {
-                for (TableColumn<Item, ?> c : orderedColumns) {
+                for (TableColumn<Equipment, ?> c : orderedColumns) {
                     if (c.getText().equals(sortCols[ix])) {
                         sortOrder.add(c);
                         c.setSortType(TableColumn.SortType.valueOf(sortDirs[ix]));
@@ -288,7 +279,7 @@ public class ItemTable extends TableView<Equipment> implements IPersistViewState
         // </editor-fold>
     }
 
-    private boolean evalCalculatedFilters(Item item) {
+    private boolean evalCalculatedFilters(Equipment item) {
         // TODO: write a multi-field eval so we don't spin up Formula.eval() in a loop
         for (CalculatedProperties.Names name : calculatedFilters.keySet()) {
             TextField field = calculatedFilters.get(name);

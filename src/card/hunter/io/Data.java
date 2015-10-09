@@ -163,8 +163,23 @@ public enum Data{
 				byte result=Byte.parseByte(string);
 				return result<0?(byte)-result:result;
 			}
+                        public int getIntOr(String string, int defVal) {
+                            String s = getString(string);
+                            
+                            if (s == null || s.isEmpty())
+                                return defVal;
+                            else try {
+                                int val = Integer.parseInt(s);
+                                return val;
+                            } catch (Exception ex) {
+                                return defVal;
+                            }
+                        }
+                        
 			public int getInt(String string){//throws NullPointerException if not found or NumberFormatException if cannot be read as int
-				return Integer.parseInt(getString(string));
+                                string=getString(string);
+                                
+                                return Integer.parseInt(string);
 			}
 			public String getString(String string){//same as get(), but throws NullPointerException instead of returning null
 				return row[columnMap.get(string)];

@@ -1,12 +1,15 @@
 package card.hunter.fx;
 
-
 import app.App;
-
+import card.hunter.Build;
+import card.hunter.Character;
+import card.hunter.Hoard;
+import card.hunter.Party;
+import card.hunter.Race;
+import card.hunter.Role;
+import card.hunter.Token;
+import card.hunter.collectible.Equipment;
 import utils.FileUtils;
-import models.Character;
-import models.Build;
-import models.Item;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Paths;
@@ -17,6 +20,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
@@ -43,11 +47,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import models.Hoard;
-import models.Party;
-import ui.CardViewer;
-import ui.ModalDialog;
-import ui.MouseHelper;
 
 //class responsible for building and displaying parties and their decks
 public class PartyView extends VBox{
@@ -67,7 +66,7 @@ public class PartyView extends VBox{
            new CardViewer().show(getStage()); 
         });
         
-        CheckMenuItem openExternally=new CheckMenuItem("Open card view in external broser");
+        CheckMenuItem openExternally=new CheckMenuItem("Open card view in external browser");
         openExternally.setOnAction(event -> {
            App.state().openExternally = openExternally.isSelected();
         });
@@ -206,11 +205,11 @@ public class PartyView extends VBox{
     //class responsible for representing a single equipped item
     public class Slot extends HBox{
         public static final byte width=82,height=70;
-        private final EnumSet<Item.Slot>set;
-        private Item.Token.Pair.View tokens;
-        public final ObjectProperty<Item>itemProperty(){return itemProperty;}
-        public final Item getItem(){return itemProperty.get();}
-        public final void setItem(Item item){
+        private final EnumSet<card.hunter.Slot>set;
+        private Token.Pair.View tokens;
+        public final ObjectProperty<Equipment>itemProperty(){return itemProperty;}
+        public final Equipment getItem(){return itemProperty.get();}
+        public final void setItem(Equipment item){
             if(!isEmpty()&&!isDefault()){
                 Party.remove(itemProperty.get());
             }
@@ -220,7 +219,7 @@ public class PartyView extends VBox{
             App.state().refresh();
         }
 
-        public final boolean isHolding(Item item){
+        public final boolean isHolding(Equipment item){
             return (itemProperty.get()==item);
         }
 
@@ -229,20 +228,20 @@ public class PartyView extends VBox{
         }
         
         public final boolean isDefault() {
-            return itemProperty.get() == set.iterator().next().dfault;
+            return itemProperty.get() == set.iterator().next().getDefaultEquipment();
         }
         
         public final void empty(){
-            setItem(set.iterator().next().dfault);
+            setItem(set.iterator().next().getDefaultEquipment());
         }
-        public final ObjectProperty<Item>itemProperty=new SimpleObjectProperty<Item>(){
-            @Override public void setValue(Item item){set(item);}
-            @Override public void set(Item item){
+        public final ObjectProperty<Equipment>itemProperty=new SimpleObjectProperty<Equipment>(){
+            @Override public void setValue(Equipment item){set(item);}
+            @Override public void set(Equipment item){
                 if(set.contains(item.slot))super.set(item);
             }
         };
-        public Slot(Item defaultItem,Item.Slot...slots){this(defaultItem.slot.toString().replace(' ','\n'),defaultItem,slots);}
-        public Slot(String string,Item defaultItem,Item.Slot...slots){
+        public Slot(Equipment defaultItem,card.hunter.Slot...slots){this(defaultItem.slot.toString().replace(' ','\n'),defaultItem,slots);}
+        public Slot(String string,Equipment defaultItem,card.hunter.Slot...slots){
             set=EnumSet.of(defaultItem.slot,slots);
             itemProperty.set(defaultItem);
             setMinSize(Slot.width,Slot.height);
@@ -266,7 +265,8 @@ public class PartyView extends VBox{
             itemProperty.addListener((observable,oldValue,newValue)->{
                 view.setImage(newValue.icon);
                 getChildren().remove(tokens);
-                getChildren().add(tokens=newValue.getTokenView());
+                tokens=(Token.Pair.View)newValue.getTokenView();
+                getChildren().add((Node)tokens);
             });
         }
     }
@@ -277,48 +277,48 @@ public class PartyView extends VBox{
         public Char getChar(){return(Char)getSelectionModel().getSelectedItem();};
         public CharPane(){
             warrior=new Char("Warrior",null,
-                    new Slot(Item.Slot.Weapon.dfault),
-                    new Slot(Item.Slot.Weapon.dfault),
+                    new Slot(card.hunter.Slot.Weapon.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Weapon.getDefaultEquipment()),
                     null,
-                    new Slot(Item.Slot.Helmet.dfault),
-                    new Slot(Item.Slot.Weapon.dfault),
-                    new Slot(Item.Slot.Shield.dfault),
+                    new Slot(card.hunter.Slot.Helmet.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Weapon.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Shield.getDefaultEquipment()),
                     null,null,
-                    new Slot(Item.Slot.Heavy_Armor.dfault),
-                    new Slot(Item.Slot.Boots.dfault),
+                    new Slot(card.hunter.Slot.Heavy_Armor.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Boots.getDefaultEquipment()),
                     null,null,null,
-                    new Slot("Racial\nSkill",Item.Slot.Dwarf_Skill.dfault,Item.Slot.Elf_Skill,Item.Slot.Human_Skill),
-                    new Slot(Item.Slot.Martial_Skill.dfault)
+                    new Slot("Racial\nSkill",card.hunter.Slot.Dwarf_Skill.getDefaultEquipment(),card.hunter.Slot.Elf_Skill,card.hunter.Slot.Human_Skill),
+                    new Slot(card.hunter.Slot.Martial_Skill.getDefaultEquipment())
             );
             priest=new Char("Priest",null,
-                    new Slot(Item.Slot.Divine_Weapon.dfault),
-                    new Slot(Item.Slot.Divine_Weapon.dfault),
+                    new Slot(card.hunter.Slot.Divine_Weapon.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Divine_Weapon.getDefaultEquipment()),
                     null,
-                    new Slot(Item.Slot.Shield.dfault),
-                    new Slot(Item.Slot.Divine_Armor.dfault),
-                    new Slot(Item.Slot.Boots.dfault),
+                    new Slot(card.hunter.Slot.Shield.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Divine_Armor.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Boots.getDefaultEquipment()),
                     null,
-                    new Slot(Item.Slot.Divine_Item.dfault),
-                    new Slot(Item.Slot.Divine_Item.dfault),
-                    new Slot(Item.Slot.Divine_Item.dfault),
+                    new Slot(card.hunter.Slot.Divine_Item.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Divine_Item.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Divine_Item.getDefaultEquipment()),
                     null,null,null,
-                    new Slot("Racial\nSkill",Item.Slot.Dwarf_Skill.dfault,Item.Slot.Elf_Skill,Item.Slot.Human_Skill),
-                    new Slot(Item.Slot.Divine_Skill.dfault)
+                    new Slot("Racial\nSkill",card.hunter.Slot.Dwarf_Skill.getDefaultEquipment(),card.hunter.Slot.Elf_Skill,card.hunter.Slot.Human_Skill),
+                    new Slot(card.hunter.Slot.Divine_Skill.getDefaultEquipment())
             );
             wizard=new Char("Wizard",
-                    new Slot(Item.Slot.Staff.dfault),
-                    new Slot(Item.Slot.Staff.dfault),
+                    new Slot(card.hunter.Slot.Staff.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Staff.getDefaultEquipment()),
                     null,
-                    new Slot(Item.Slot.Arcane_Item.dfault),
-                    new Slot(Item.Slot.Arcane_Item.dfault),
-                    new Slot(Item.Slot.Arcane_Item.dfault),
+                    new Slot(card.hunter.Slot.Arcane_Item.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Arcane_Item.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Arcane_Item.getDefaultEquipment()),
                     null,
-                    new Slot(Item.Slot.Arcane_Item.dfault),
-                    new Slot(Item.Slot.Robes.dfault),
-                    new Slot(Item.Slot.Boots.dfault),
+                    new Slot(card.hunter.Slot.Arcane_Item.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Robes.getDefaultEquipment()),
+                    new Slot(card.hunter.Slot.Boots.getDefaultEquipment()),
                     null,null,null,
-                    new Slot("Racial\nSkill",Item.Slot.Dwarf_Skill.dfault,Item.Slot.Elf_Skill,Item.Slot.Human_Skill),
-                    new Slot(Item.Slot.Arcane_Skill.dfault)
+                    new Slot("Racial\nSkill",card.hunter.Slot.Dwarf_Skill.getDefaultEquipment(),card.hunter.Slot.Elf_Skill,card.hunter.Slot.Human_Skill),
+                    new Slot(card.hunter.Slot.Arcane_Skill.getDefaultEquipment())
             );
             setMaxHeight(265);
             setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
@@ -364,7 +364,7 @@ public class PartyView extends VBox{
 
                 GridPane grid=new GridPane();
                 boolean newColumn=true;
-                Label minorLabel=new Label("4",Item.Token.Minor.getView()),majorLabel=new Label("4",Item.Token.Major.getView());
+                Label minorLabel=new Label("4",Token.Minor.getView()),majorLabel=new Label("4",Token.Major.getView());
                 for(int i=0,column=0,row=0;i<slots.length;++i){
                     if(slots[i]==null){
                         if(newColumn)grid.add(new Rectangle(Slot.width,Slot.height/2,Color.TRANSPARENT),column,row++);
@@ -374,16 +374,16 @@ public class PartyView extends VBox{
                         newColumn=false;
                         row+=2;
                         slots[i].itemProperty.addListener((observable,oldValue,newValue)->{
-                            final Item.Token oldToken1=oldValue.token1,oldToken2=oldValue.token2,newToken1=newValue.token1,newToken2=newValue.token2;
+                            final Token oldToken1=oldValue.token1,oldToken2=oldValue.token2,newToken1=newValue.token1,newToken2=newValue.token2;
                             byte minorTotal=Byte.parseByte(minorLabel.getText()),majorTotal=Byte.parseByte(majorLabel.getText());
-                            if(oldToken1==Item.Token.Minor)++minorTotal;
-                            else if(oldToken1==Item.Token.Major)++majorTotal;
-                            if(oldToken2==Item.Token.Minor)++minorTotal;
-                            else if(oldToken2==Item.Token.Major)++majorTotal;
-                            if(newToken1==Item.Token.Minor)--minorTotal;
-                            else if(newToken1==Item.Token.Major)--majorTotal;
-                            if(newToken2==Item.Token.Minor)--minorTotal;
-                            else if(newToken2==Item.Token.Major)--majorTotal;
+                            if(oldToken1==Token.Minor)++minorTotal;
+                            else if(oldToken1==Token.Major)++majorTotal;
+                            if(oldToken2==Token.Minor)++minorTotal;
+                            else if(oldToken2==Token.Major)++majorTotal;
+                            if(newToken1==Token.Minor)--minorTotal;
+                            else if(newToken1==Token.Major)--majorTotal;
+                            if(newToken2==Token.Minor)--minorTotal;
+                            else if(newToken2==Token.Major)--majorTotal;
                             minorLabel.setText(String.valueOf(minorTotal));
                             majorLabel.setText(String.valueOf(majorTotal));
                             if(majorTotal<0||majorTotal+minorTotal<0){
@@ -399,8 +399,8 @@ public class PartyView extends VBox{
                 Spinner<Integer>levelSpinner=new Spinner<>(6,24,18);
                 levelSpinner.setMaxWidth(52);
                 (this.levelProperty=levelSpinner.valueProperty()).addListener((observable,oldValue,newValue) -> {
-                    final int minorTotal=Byte.parseByte(minorLabel.getText())+Item.Token.Minor.getAmountAtLevel(newValue)-Item.Token.Minor.getAmountAtLevel(oldValue);
-                    final int majorTotal=Byte.parseByte(majorLabel.getText())+Item.Token.Major.getAmountAtLevel(newValue)-Item.Token.Major.getAmountAtLevel(oldValue);
+                    final int minorTotal=99; //Byte.parseByte(minorLabel.getText())+Token.Minor.getAmountAtLevel(newValue)-Token.Minor.getAmountAtLevel(oldValue);
+                    final int majorTotal=99; //Byte.parseByte(majorLabel.getText())+Token.Major.getAmountAtLevel(newValue)-Token.Major.getAmountAtLevel(oldValue);
                     minorLabel.setText(String.valueOf(minorTotal));
                     majorLabel.setText(String.valueOf(majorTotal));
                     if(majorTotal<0||minorTotal+majorTotal<0){
@@ -426,14 +426,14 @@ public class PartyView extends VBox{
                 }
 
                 System.out.format("Cloning equipment: %s\n",equipment.items.toString());
-                ArrayList<Item> copy=(ArrayList<Item>) equipment.items.clone();
+                ArrayList<Equipment> copy=(ArrayList<Equipment>) equipment.items.clone();
 
                 System.out.format("Equipping slots...\n");
                 for(Slot s : itemSlots){
                     if(s!=null){
                         System.out.format("\tTrying to fill a %s slot...\n",s.set.toArray()[0].toString());
-                        Item item=null;
-                        for(Item i : copy){
+                        Equipment item=null;
+                        for(Equipment i : copy){
                             System.out.format("\t\tConsidering %s, which is a %s...\n",i.name,i.slot.toString());
                             if(s.set.contains(i.slot)){
                                 System.out.format("\t\tThat's a match!\n");
@@ -472,44 +472,44 @@ public class PartyView extends VBox{
                 return c;
             }
 
-            private Character.Race getRace(){
+            private Race getRace(){
                 // HACK: Racial is 2 from the end.
                 Slot racialSlot=itemSlots[itemSlots.length-2];
-                Item.Slot type = racialSlot.getItem().slot;
+                card.hunter.Slot type = racialSlot.getItem().slot;
 
                 switch(type){
                     case Dwarf_Skill:
-                        return Character.Race.Dwarf;
+                        return Race.Dwarf;
                     case Elf_Skill:
-                        return Character.Race.Elf;
+                        return Race.Elf;
                     case Human_Skill:
-                        return Character.Race.Human;
+                        return Race.Human;
                     default:
                         System.err.format("Weird - was looking at a racial skill slot, but got %s instead.", type);
-                        return Character.Race.Human;
+                        return Race.Human;
                 }
             }
 
-            private Character.Role getRole(){
+            private Role getRole(){
                 // HACK: Second slot always contains a weapon.
                 Slot weaponSlot=itemSlots[1];
-                Item.Slot type = weaponSlot.getItem().slot;
+                card.hunter.Slot type = weaponSlot.getItem().slot;
 
                 switch(type){
                     case Divine_Weapon:
-                        return Character.Role.Priest;
+                        return Role.Priest;
                     case Weapon:
-                        return Character.Role.Warrior;
+                        return Role.Warrior;
                     case Staff:
-                        return Character.Role.Wizard;
+                        return Role.Wizard;
                     default:
                         System.out.format("Weird - was looking at a weapon slot, but got %s instead.", type);
-                        return Character.Role.Warrior;
+                        return Role.Warrior;
                 }
             }
 
-            private Item[] getItems(){
-                ArrayList<Item> items = new ArrayList<Item>();
+            private Equipment[] getItems(){
+                ArrayList<Equipment> items = new ArrayList<Equipment>();
                 
                 for (Slot s : itemSlots)
                 {
@@ -519,7 +519,7 @@ public class PartyView extends VBox{
                    }
                 }
                 
-                return items.toArray(new Item[items.size()]);
+                return items.toArray(new Equipment[items.size()]);
             }
         }
     }

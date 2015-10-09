@@ -2,6 +2,7 @@ package card.hunter;
 
 import card.hunter.collectible.Equipment;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Build{
@@ -10,7 +11,7 @@ public class Build{
     public final String name;
     public final int minLevel;
     public final Race race;
-    public final Character role;
+    public final Role role;
     public final ArrayList<Equipment> items;
 
     public String getName(){
@@ -25,7 +26,7 @@ public class Build{
         return race;
     }
 
-    public Character getRole(){
+    public Role getRole(){
         return role;
     }
 
@@ -34,15 +35,13 @@ public class Build{
     }
 
     // </editor-fold>
-    public Build(String name,Race race,Character role,int minLevel,Equipment... items){
+    public Build(String name,Race race,Role role,int minLevel,Equipment... items){
         this.name=name;
         this.minLevel=minLevel;
         this.race=race;
         this.role=role;
-        this.items=new ArrayList<Equipment>(12);
-        for(Equipment i : items){
-            this.items.add(i);
-        }
+        this.items=new ArrayList<>(12);
+        this.items.addAll(Arrays.asList(items));
     }
 
     public static boolean areIdentical(Build a,Build b){

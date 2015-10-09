@@ -1,6 +1,7 @@
-package models;
+package card.hunter;
 
 // Class for representing a party of Card Hunter characters
+import card.hunter.collectible.Equipment;
 import java.util.ArrayList;
 
 public class Party extends ArrayList<Character>{
@@ -16,17 +17,17 @@ public class Party extends ArrayList<Character>{
     }
     // </editor-fold>
 
-    private CountBag<Item> equipment=new CountBag<>();
+    private CountBag<Equipment> equipment=new CountBag<>();
 
-    public static void add(Item item){
+    public static void add(Equipment item){
         get().equipment.add(item);
     }
 
-    public static void remove(Item item){
+    public static void remove(Equipment item){
         get().equipment.remove(item);
     }
 
-    public static int count(Item item){
+    public static int count(Equipment item){
         return get().equipment.countOf(item);
     }
 }

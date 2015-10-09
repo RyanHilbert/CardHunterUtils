@@ -1,4 +1,4 @@
-package ui;
+package card.hunter.fx;
 
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;

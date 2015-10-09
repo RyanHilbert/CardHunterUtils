@@ -1,23 +1,23 @@
-package ui;
+package card.hunter.fx;
 
 import app.App;
+import card.hunter.collectible.Equipment;
 import java.io.File;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import models.Item;
 import utils.FileUtils;
 
 public class CardViewer {
-    private Item item;
+    private Equipment item;
     private boolean showAll;
     
     public CardViewer() { 
         this.showAll = true;
     }
     
-    public CardViewer(Item item) {
+    public CardViewer(Equipment item) {
         this.item = item;
     }
     

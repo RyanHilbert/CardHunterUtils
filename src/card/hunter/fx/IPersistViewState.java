@@ -1,4 +1,4 @@
-package ui;
+package card.hunter.fx;
 
 public interface IPersistViewState {
     public void setViewFromState();

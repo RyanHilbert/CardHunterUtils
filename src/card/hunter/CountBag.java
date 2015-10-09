@@ -1,4 +1,4 @@
-package models;
+package card.hunter;
 
 import java.util.HashMap;
 import java.util.Map;

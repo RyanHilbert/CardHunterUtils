@@ -1,10 +1,10 @@
-package models;
+package card.hunter;
 
 import java.util.ArrayList;
 import java.util.function.Function;
-import static models.CalculatedProperties.invoke;
-import models.Card.AttackType;
-import models.Card.Type;
+import static card.hunter.CalculatedProperties.invoke;
+import card.hunter.collectible.Card;
+import card.hunter.collectible.Equipment;
 
 public class CalculatedProperties {
     public enum Names { 
@@ -34,7 +34,7 @@ public class CalculatedProperties {
         }
     }
     
-    public static int calc(Names name, Item item) {
+    public static int calc(Names name, Equipment item) {
         switch (name) {
             case Damage:
                 return invoke(Damage::calc, item, Op.Sum);
@@ -59,7 +59,7 @@ public class CalculatedProperties {
     
     public static class VampDamage {
         public static int calc(Card card) {
-            if (card.attackType == AttackType.Melee)
+            if (card.attackType == Attack_Type.Melee)
                 if (card.text.contains("<u>Heal "))
                     return card.damage;
                     
@@ -84,31 +84,24 @@ public class CalculatedProperties {
     
     public enum Op { Sum,Avg,Min,Max };
         
-    public static int invoke(Function<Card, Integer> fn, Item item, Op op) {
+    public static int invoke(Function<Card, Integer> fn, Equipment item, Op op) {
         ArrayList<Integer> vals = new ArrayList<>();
         
-        if (item.card1 != null)
-            vals.add(invoke(fn, item.card1));
-        if (item.card2 != null)
-            vals.add(invoke(fn, item.card2));
-        if (item.card3 != null)
-            vals.add(invoke(fn, item.card3));
-        if (item.card4 != null)
-            vals.add(invoke(fn, item.card4));
-        if (item.card5 != null)
-            vals.add(invoke(fn, item.card5));
-        if (item.card6 != null)
-            vals.add(invoke(fn, item.card6));
-        
-        switch (op) {
-            case Sum:
-                return vals.stream().mapToInt(i -> i).sum();
-            case Avg:
-                return (int)Math.floor(vals.stream().mapToInt(i -> i).average().orElse(0));
-            case Min: 
-                return vals.stream().mapToInt(i -> i).min().orElse(0);
-            case Max:
-                return vals.stream().mapToInt(i -> i).max().orElse(0);
+        if (item.cards != null) {
+            for (Card c : item.cards)
+                if (c != null)
+                    vals.add(invoke(fn, c));
+
+            switch (op) {
+                case Sum:
+                    return vals.stream().mapToInt(i -> i).sum();
+                case Avg:
+                    return (int)Math.floor(vals.stream().mapToInt(i -> i).average().orElse(0));
+                case Min: 
+                    return vals.stream().mapToInt(i -> i).min().orElse(0);
+                case Max:
+                    return vals.stream().mapToInt(i -> i).max().orElse(0);
+            }
         }
         
         return 0;

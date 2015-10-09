@@ -1,4 +1,4 @@
-package models;
+package card.hunter;
 
 public class Trigger {
     public final Integer trigger;
