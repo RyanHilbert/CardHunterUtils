@@ -26,17 +26,17 @@ import javafx.scene.text.FontWeight;
 //class used to represent every card in the game
 public class Card{
     //map links every card's name to its object identity
-    public static final ObservableMap<String,Card>map=FXCollections.observableMap(new LinkedHashMap());
+    public static final ObservableMap<String,Card>map=FXCollections.observableMap(new LinkedHashMap<>());
     
     public static final int ILLUSTRATION_WIDTH=217,ILLUSTRATION_HEIGHT=129,THUMBNAIL_WIDTH=62,THUMBNAIL_HEIGHT=37;
     
     public enum Type{
         Armor(Color.GRAY),Assist(Color.LIGHTGRAY),Attack(Color.DARKRED),Block(Color.OLIVEDRAB),Boost(Color.CHOCOLATE),Handicap(new Color(.2,.2,.2,1)),Move(Color.STEELBLUE),Utility(Color.MEDIUMPURPLE);
         public final Color color;
-        private Type(Color color){this.color=color;}
+        Type(Color color){this.color=color;}
     }
     public enum AttackType{Magic,Melee,Projectile}
-    public enum DamageType{Acid,Arcane,Cold,Crushing,Electrical,Fire,Holy,Laser,Piercing,Poison,Psychic,Radiation,Slashing,Sonic,Unholy}
+    public enum DamageType{Acid,Arcane,Cold,Crushing,Electrical,Fire,Holy,Laser,Piercing,Poison,Psychic,Radiation,Silver,Slashing,Sonic,Unholy}
     public enum Quality{
         Black_,Black,Black$,
         Paper_,Paper,Paper$,
