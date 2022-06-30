@@ -55,7 +55,7 @@ public class Item{
         
         //hack used to turn token pairs into an Enum for use with other classes
         public static enum Pair{
-            None_None,Minor_None,Minor_Minor,Major_None,Major_Minor,Major_Major;//,Great_None,Great_Major,Great_Great,Ultimate_None,Ultimate_Great,Ultimate_Ultimate;
+            None_None,Minor_None,Minor_Minor,Major_None,Major_Minor,Major_Major,Great_Major;//,Great_None,Great_Major,Great_Great,Ultimate_None,Ultimate_Great,Ultimate_Ultimate;
             public static Pair get(Token t1,Token t2){return Pair.valueOf(t1+"_"+t2);}
             public View getView(){return new View();}
             public HView getHView(){return new HView();}

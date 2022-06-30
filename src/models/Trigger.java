@@ -20,5 +20,5 @@ public class Trigger {
         this.amountRight = 0;
     }    
     
-    public enum Effect{Armor,Block,Boost,Handicap,Move,Special}
+    public enum Effect{Armor,Attack,Block,Boost,Handicap,Move,Special}
 }
